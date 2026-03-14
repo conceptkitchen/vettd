@@ -4,10 +4,25 @@ Scans claude_desktop_config.json or .mcp.json for security issues.
 """
 
 import json
+import os
 import re
 from typing import List
 
 from checkers import Finding
+
+
+def _validate_file_path(file_path: str, must_exist: bool = True) -> str:
+    """Validate and resolve a file path to prevent path traversal attacks."""
+    resolved = os.path.realpath(os.path.expanduser(file_path))
+    if must_exist and not os.path.isfile(resolved):
+        raise ValueError(f"Not a regular file: {file_path}")
+    # Block reading from sensitive system paths
+    sensitive_prefixes = ["/etc/shadow", "/etc/passwd", "/proc/", "/sys/",
+                          os.path.expanduser("~/.ssh/"), os.path.expanduser("~/.gnupg/")]
+    for prefix in sensitive_prefixes:
+        if resolved.startswith(prefix):
+            raise ValueError(f"Access denied: cannot read from {prefix}")
+    return resolved
 
 
 def scan_mcp_config(config_path: str) -> dict:
@@ -19,7 +34,8 @@ def scan_mcp_config(config_path: str) -> dict:
         check_results: dict of {check_name: [findings]}
         config_summary: dict with tool counts, server names, etc.
     """
-    with open(config_path, "r") as f:
+    resolved_path = _validate_file_path(config_path)
+    with open(resolved_path, "r") as f:
         raw_content = f.read()
 
     try:

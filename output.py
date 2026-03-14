@@ -49,6 +49,12 @@ def _should_color():
     return sys.stdout.isatty()
 
 
+def _sanitize_evidence(text: str) -> str:
+    """Strip ANSI escape codes from untrusted evidence to prevent terminal injection."""
+    import re
+    return re.sub(r'\x1b\[[0-9;]*[a-zA-Z]', '', text)
+
+
 def print_scan_result(label: str, check_results: Dict[str, List[Finding]],
                       score_data: dict, verbose: bool = False):
     """Print colored terminal output for a single scan."""
@@ -70,7 +76,7 @@ def print_scan_result(label: str, check_results: Dict[str, List[Finding]],
         if not findings:
             print(f"    \u2705 {padded_name} {Colors.GREEN}PASS{Colors.RESET}")
         else:
-            first_evidence = findings[0].evidence[:50]
+            first_evidence = _sanitize_evidence(findings[0].evidence[:50])
             count_str = f" ({len(findings)} found)" if len(findings) > 1 else ""
             print(f"    \u274c {padded_name} {Colors.RED}FAIL{Colors.RESET}{count_str}")
             if verbose:
@@ -78,8 +84,8 @@ def print_scan_result(label: str, check_results: Dict[str, List[Finding]],
                     sev_color = Colors.RED if f.severity == "critical" else (
                         Colors.YELLOW if f.severity in ("high", "medium") else Colors.DIM
                     )
-                    print(f"       {sev_color}[{f.severity.upper()}]{Colors.RESET} {f.description}")
-                    print(f"       {Colors.DIM}Evidence: {f.evidence[:80]}{Colors.RESET}")
+                    print(f"       {sev_color}[{f.severity.upper()}]{Colors.RESET} {_sanitize_evidence(f.description)}")
+                    print(f"       {Colors.DIM}Evidence: {_sanitize_evidence(f.evidence[:80])}{Colors.RESET}")
             else:
                 # Show first finding inline
                 print(f"       {Colors.DIM}(found: \"{first_evidence}\"){Colors.RESET}")
@@ -247,8 +253,25 @@ def _batch_summary_data(results: List[dict]) -> dict:
     }
 
 
+def _validate_output_path(output_path: str) -> str:
+    """Validate output path to prevent writing to sensitive locations."""
+    resolved = os.path.realpath(os.path.expanduser(output_path))
+    # Block writing to sensitive system paths
+    sensitive_prefixes = ["/etc/", "/proc/", "/sys/", "/var/log/",
+                          os.path.expanduser("~/.ssh/"), os.path.expanduser("~/.gnupg/")]
+    for prefix in sensitive_prefixes:
+        if resolved.startswith(prefix):
+            raise ValueError(f"Access denied: cannot write to {prefix}")
+    # Ensure parent directory exists
+    parent = os.path.dirname(resolved)
+    if parent and not os.path.isdir(parent):
+        raise ValueError(f"Parent directory does not exist: {parent}")
+    return resolved
+
+
 def generate_report(results: List[dict], output_path: str):
     """Generate a markdown report file."""
+    validated_path = _validate_output_path(output_path)
     lines = []
     lines.append("# Vettd Security Scan Report")
     lines.append(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -309,7 +332,7 @@ def generate_report(results: List[dict], output_path: str):
         lines.append("")
 
     report = "\n".join(lines)
-    with open(output_path, "w") as f:
+    with open(validated_path, "w") as f:
         f.write(report)
 
-    return output_path
+    return validated_path

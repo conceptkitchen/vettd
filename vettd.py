@@ -67,19 +67,40 @@ def scan_text(text: str, label: str = "inline text",
     }
 
 
-def scan_file(file_path: str, deep: bool = False, verbose: bool = False) -> dict:
-    """Scan a single file. Returns result dict."""
-    path = Path(file_path)
+def _validate_scan_path(file_path: str) -> Path:
+    """Validate scan target path to prevent path traversal."""
+    path = Path(file_path).resolve()
     if not path.exists():
         print(f"  Error: File not found: {file_path}", file=sys.stderr)
         sys.exit(1)
+    if not path.is_file():
+        print(f"  Error: Not a regular file: {file_path}", file=sys.stderr)
+        sys.exit(1)
+    # Block scanning sensitive system files
+    sensitive = ["/etc/shadow", "/etc/passwd", str(Path.home() / ".ssh"),
+                 str(Path.home() / ".gnupg")]
+    for s in sensitive:
+        if str(path).startswith(s):
+            print(f"  Error: Access denied: {file_path}", file=sys.stderr)
+            sys.exit(1)
+    # Size limit: don't scan files larger than 1MB (prompts shouldn't be this big)
+    if path.stat().st_size > 1_048_576:
+        print(f"  Error: File too large (>1MB): {file_path}", file=sys.stderr)
+        sys.exit(1)
+    return path
+
+
+def scan_file(file_path: str, deep: bool = False, verbose: bool = False) -> dict:
+    """Scan a single file. Returns result dict."""
+    path = _validate_scan_path(file_path)
 
     text = path.read_text(encoding="utf-8", errors="replace")
     label = path.name
     return scan_text(text, label=label, deep=deep, verbose=verbose)
 
 
-def scan_directory(dir_path: str, deep: bool = False, verbose: bool = False) -> list:
+def scan_directory(dir_path: str, deep: bool = False, verbose: bool = False,
+                   deep_limit: int = 10) -> list:
     """Scan all text files in a directory. Returns list of result dicts."""
     path = Path(dir_path)
     if not path.exists() or not path.is_dir():
@@ -90,6 +111,9 @@ def scan_directory(dir_path: str, deep: bool = False, verbose: bool = False) -> 
     extensions = {".txt", ".md", ".prompt", ".system", ".json", ".yaml", ".yml"}
     files = []
     for f in sorted(path.rglob("*")):
+        # Skip symlinks to prevent following links to sensitive files
+        if f.is_symlink():
+            continue
         if f.is_file() and f.suffix.lower() in extensions:
             files.append(f)
 
@@ -99,9 +123,18 @@ def scan_directory(dir_path: str, deep: bool = False, verbose: bool = False) -> 
         return []
 
     results = []
+    deep_count = 0
     for f in files:
-        result = scan_file(str(f), deep=deep, verbose=verbose)
+        # Enforce deep scan limit to prevent API bill shock
+        use_deep = deep and deep_count < deep_limit
+        result = scan_file(str(f), deep=use_deep, verbose=verbose)
+        if use_deep:
+            deep_count += 1
         results.append(result)
+
+    if deep and deep_count >= deep_limit and len(files) > deep_limit:
+        print(f"  Note: Deep scan limited to {deep_limit} files "
+              f"(use --deep-limit to adjust)", file=sys.stderr)
 
     return results
 
@@ -147,6 +180,8 @@ Examples:
 
     scan_parser.add_argument("--deep", action="store_true",
                             help="Enable Claude API semantic analysis (requires ANTHROPIC_API_KEY)")
+    scan_parser.add_argument("--deep-limit", type=int, default=10, metavar="N",
+                            help="Max files to deep-scan in batch mode (default: 10, prevents API bill shock)")
     scan_parser.add_argument("--json", action="store_true",
                             help="Output as JSON")
     scan_parser.add_argument("--report", metavar="PATH",
@@ -180,7 +215,8 @@ Examples:
         result = scan_file(args.file, deep=args.deep, verbose=args.verbose)
         results.append(result)
     elif args.dir:
-        results = scan_directory(args.dir, deep=args.deep, verbose=args.verbose)
+        results = scan_directory(args.dir, deep=args.deep, verbose=args.verbose,
+                                deep_limit=args.deep_limit)
     elif args.mcp:
         result = scan_mcp(args.mcp, verbose=args.verbose)
         results.append(result)

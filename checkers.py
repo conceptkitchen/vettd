@@ -498,8 +498,14 @@ ALL_CHECKERS = [
 ]
 
 
+MAX_TEXT_LENGTH = 50_000  # Limit input to prevent ReDoS on attacker-controlled text
+
+
 def run_all_checks(text: str) -> dict:
     """Run all checkers against text. Returns dict of {check_name: [findings]}."""
+    # Truncate excessively long text to prevent ReDoS attacks
+    if len(text) > MAX_TEXT_LENGTH:
+        text = text[:MAX_TEXT_LENGTH]
     results = {}
     for name, checker_fn in ALL_CHECKERS:
         results[name] = checker_fn(text)
