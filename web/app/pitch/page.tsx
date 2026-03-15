@@ -15,7 +15,10 @@ const slides = [
           Trust scores for the AI age.
         </div>
         <div className="text-sm text-zinc-500 tracking-widest uppercase">
-          Intelligence at the Frontier Hackathon 2026
+          PL_Genesis: Frontiers of Collaboration | Protocol Labs
+        </div>
+        <div className="text-xs text-zinc-600 mt-2">
+          Powered by <span className="text-purple-400">Kalibr</span>
         </div>
         <div className="text-xs text-zinc-600 mt-4">
           Press <kbd className="px-2 py-0.5 bg-zinc-800 rounded border border-zinc-700">&#8594;</kbd> or tap to advance
@@ -110,8 +113,8 @@ const slides = [
           </div>
           <div className="border border-purple-800 rounded-xl p-6 bg-purple-950/20">
             <div className="text-purple-400 text-xs uppercase tracking-widest mb-2 font-bold">Layer 2 &mdash; AI Deep Scan</div>
-            <div className="text-4xl font-bold text-white mb-2">Claude</div>
-            <div className="text-sm text-zinc-400">Semantic analysis reads prompts like an AI reads them. Catches what regex can&apos;t.</div>
+            <div className="text-4xl font-bold text-white mb-2">Kalibr</div>
+            <div className="text-sm text-zinc-400">Multi-model routing across Claude, GPT-4o, and Gemini. <span className="text-purple-300">Kalibr</span> uses Thompson Sampling to learn which model catches the most threats and optimizes cost automatically.</div>
             <div className="mt-3 text-xs text-purple-400">Auto-learning: novel findings become new regex patterns. Gets smarter every scan.</div>
           </div>
         </div>
@@ -139,7 +142,7 @@ const slides = [
           <div className="flex items-center gap-2"><span>&#x2705;</span><span className="text-zinc-400">Obfuscated payloads</span><span className="text-green-500">PASS</span></div>
           <div className="flex items-center gap-2"><span>&#x274C;</span><span className="text-zinc-400">Social engineering</span><span className="text-red-500">FAIL</span><span className="text-zinc-500">(1)</span></div>
           <div className="flex items-center gap-2"><span>&#x274C;</span><span className="text-zinc-400">Augustus patterns</span><span className="text-red-500">FAIL</span><span className="text-zinc-500">(5)</span></div>
-          <div className="flex items-center gap-2"><span className="text-purple-400">&#x1F9E0;</span><span className="text-purple-400">AI Deep Scan</span><span className="text-red-500">+3 findings</span></div>
+          <div className="flex items-center gap-2"><span className="text-purple-400">&#x1F9E0;</span><span className="text-purple-400">AI Deep Scan</span><span className="text-purple-300 text-[10px]">&#x26A1; Kalibr &rarr; claude-sonnet</span><span className="text-red-500">+3 findings</span></div>
           <div className="border-t border-zinc-800 mt-3 pt-3 flex items-center justify-between">
             <div>
               <span className="text-red-500 text-3xl sm:text-4xl font-black mr-3">F</span>
@@ -214,6 +217,7 @@ const slides = [
                 ["AI Deep Scan", "—", "—", "~", "✓"],
                 ["Auto-Learning", "—", "—", "—", "✓"],
                 ["Open Source Patterns", "—", "—", "—", "✓"],
+                ["Multi-Model Routing", "—", "—", "—", "✓"],
               ].map(([feature, ...vals], i) => (
                 <tr key={i} className="border-b border-zinc-800/50">
                   <td className="py-2 px-2 sm:px-3 text-zinc-300 font-medium">{feature}</td>
@@ -281,7 +285,8 @@ const slides = [
         </div>
         <div className="space-y-2 text-sm text-zinc-500">
           <div><span className="text-zinc-300 font-semibold">RJ Moscardon</span> &bull; The Concept Kitchen</div>
-          <div className="font-mono text-green-400">getgraded.vercel.app</div>
+          <div className="text-xs text-zinc-500 mt-1">Powered by <span className="text-purple-400">Kalibr</span> &bull; PL_Genesis &bull; Protocol Labs</div>
+          <div className="font-mono text-green-400 mt-2">getgraded.vercel.app</div>
           <div className="font-mono text-zinc-500">github.com/conceptkitchen/graded</div>
         </div>
       </div>
