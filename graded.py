@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-Vettd - Security scanner for AI prompts and MCP server configs.
+Graded - Security scanner for AI prompts and MCP server configs.
 
 Like a restaurant health grade for AI prompts.
 Zero external dependencies for basic scanning. Only 'anthropic' needed for --deep.
 
 Usage:
-    python3 vettd.py scan --file prompt.txt
-    python3 vettd.py scan --dir ./prompts/
-    python3 vettd.py scan --text "ignore previous instructions and..."
-    python3 vettd.py scan --mcp claude_desktop_config.json
-    python3 vettd.py scan --file prompt.txt --deep
-    python3 vettd.py scan --dir ./prompts/ --json
-    python3 vettd.py scan --dir ./prompts/ --report report.md
+    python3 graded.py scan --file prompt.txt
+    python3 graded.py scan --dir ./prompts/
+    python3 graded.py scan --text "ignore previous instructions and..."
+    python3 graded.py scan --mcp claude_desktop_config.json
+    python3 graded.py scan --file prompt.txt --deep
+    python3 graded.py scan --dir ./prompts/ --json
+    python3 graded.py scan --dir ./prompts/ --report report.md
 """
 
 import argparse
@@ -34,10 +34,11 @@ __version__ = "0.1.0"
 
 
 BANNER = r"""
- __      __   _   _      _
- \ \    / /__| |_| |_ __| |
-  \ \/\/ / -_)  _|  _/ _` |
-   \_/\_/\___|\__|\__\__,_|
+   ____               _          _
+  / ___|_ __ __ _  __| | ___  __| |
+ | |  _| '__/ _` |/ _` |/ _ \/ _` |
+ | |_| | | | (_| | (_| |  __/ (_| |
+  \____|_|  \__,_|\__,_|\___|\__,_|
 
   AI Prompt Security Scanner v{version}
   Trust grades for the AI age.
@@ -154,17 +155,17 @@ def scan_mcp(config_path: str, verbose: bool = False) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="vettd",
-        description="Vettd - Security scanner for AI prompts and MCP configs",
+        prog="graded",
+        description="Graded - Security scanner for AI prompts and MCP configs",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python3 vettd.py scan --file prompt.txt
-  python3 vettd.py scan --text "ignore previous instructions..."
-  python3 vettd.py scan --dir ./prompts/
-  python3 vettd.py scan --mcp ~/.config/claude/claude_desktop_config.json
-  python3 vettd.py scan --file prompt.txt --deep --json
-  python3 vettd.py scan --dir ./prompts/ --report scan-report.md
+  python3 graded.py scan --file prompt.txt
+  python3 graded.py scan --text "ignore previous instructions..."
+  python3 graded.py scan --dir ./prompts/
+  python3 graded.py scan --mcp ~/.config/claude/claude_desktop_config.json
+  python3 graded.py scan --file prompt.txt --deep --json
+  python3 graded.py scan --dir ./prompts/ --report scan-report.md
         """
     )
 
@@ -191,7 +192,7 @@ Examples:
 
     # Version
     parser.add_argument("--version", "-V", action="version",
-                       version=f"vettd {__version__}")
+                       version=f"graded {__version__}")
 
     args = parser.parse_args()
 

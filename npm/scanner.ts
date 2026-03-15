@@ -1,5 +1,5 @@
 /**
- * Graded - Browser-side prompt security scanner.
+ * Graded Scanner Core — shared between MCP server, API, and npm package.
  * TypeScript port of the Python regex checkers.
  */
 
@@ -10,7 +10,7 @@ export interface Finding {
   evidence: string;
 }
 
-export interface ScanResult {
+export interface CheckResult {
   checkName: string;
   passed: boolean;
   findings: Finding[];
@@ -26,8 +26,8 @@ export interface ScoreData {
   lowCount: number;
 }
 
-export interface FullScanResult {
-  checks: ScanResult[];
+export interface ScanResult {
+  checks: CheckResult[];
   scoreData: ScoreData;
 }
 
@@ -64,7 +64,16 @@ function searchPatterns(
     }
   }
 
-  // Deduplicate
+  const seen = new Set<string>();
+  return findings.filter((f) => {
+    const key = `${f.category}:${f.evidence.toLowerCase()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function dedupe(findings: Finding[]): Finding[] {
   const seen = new Set<string>();
   return findings.filter((f) => {
     const key = `${f.category}:${f.evidence.toLowerCase()}`;
@@ -211,7 +220,8 @@ function checkHiddenText(text: string): Finding[] {
   };
 
   for (const [char, name] of Object.entries(invisibleChars)) {
-    const count = (text.match(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g")) || []).length;
+    const escaped = char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const count = (text.match(new RegExp(escaped, "g")) || []).length;
     if (count > 0) {
       findings.push({
         category: "Hidden Text",
@@ -230,7 +240,8 @@ function checkHiddenText(text: string): Finding[] {
   };
 
   for (const [char, name] of Object.entries(rtlChars)) {
-    const count = (text.match(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g")) || []).length;
+    const escaped = char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const count = (text.match(new RegExp(escaped, "g")) || []).length;
     if (count > 0) {
       findings.push({
         category: "Hidden Text",
@@ -241,7 +252,6 @@ function checkHiddenText(text: string): Finding[] {
     }
   }
 
-  // Mixed script detection
   if (text.length > 20) {
     const hasLatin = /[a-zA-Z]/.test(text);
     const hasCyrillic = /[\u0400-\u04ff]/.test(text);
@@ -262,7 +272,6 @@ function checkHiddenText(text: string): Finding[] {
 function checkObfuscatedPayloads(text: string): Finding[] {
   const findings: Finding[] = [];
 
-  // Base64 detection
   const b64Pattern = /(?<![A-Za-z0-9+/])([A-Za-z0-9+/]{20,}={0,2})(?![A-Za-z0-9+/])/g;
   let match;
   while ((match = b64Pattern.exec(text)) !== null) {
@@ -271,8 +280,10 @@ function checkObfuscatedPayloads(text: string): Finding[] {
       if (candidate.length % 4) {
         candidate += "=".repeat(4 - (candidate.length % 4));
       }
-      const decoded = atob(candidate);
-      const printable = [...decoded].filter((c) => c.charCodeAt(0) >= 32 && c.charCodeAt(0) < 127).length;
+      const decoded = Buffer.from(candidate, "base64").toString("utf-8");
+      const printable = [...decoded].filter(
+        (c) => c.charCodeAt(0) >= 32 && c.charCodeAt(0) < 127
+      ).length;
       if (decoded.length > 4 && printable / decoded.length > 0.7) {
         findings.push({
           category: "Obfuscated Payload",
@@ -295,7 +306,9 @@ function checkObfuscatedPayloads(text: string): Finding[] {
     "subprocess\\s*\\.\\s*(?:call|run|Popen)",
     "os\\s*\\.\\s*system\\s*\\(",
   ];
-  findings.push(...searchPatterns(text, evalPatterns, "Obfuscated Payload", "medium", 'Code execution pattern: "{evidence}"'));
+  findings.push(
+    ...searchPatterns(text, evalPatterns, "Obfuscated Payload", "medium", 'Code execution pattern: "{evidence}"')
+  );
 
   return dedupe(findings);
 }
@@ -337,16 +350,6 @@ function checkSocialEngineering(text: string): Finding[] {
   return searchPatterns(text, patterns, "Social Engineering", "high", 'Social engineering: "{evidence}"');
 }
 
-function dedupe(findings: Finding[]): Finding[] {
-  const seen = new Set<string>();
-  return findings.filter((f) => {
-    const key = `${f.category}:${f.evidence.toLowerCase()}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
 const ALL_CHECKERS: [string, (text: string) => Finding[]][] = [
   ["Jailbreak patterns", checkJailbreak],
   ["Instruction override", checkInstructionOverride],
@@ -358,7 +361,7 @@ const ALL_CHECKERS: [string, (text: string) => Finding[]][] = [
   ["Social engineering", checkSocialEngineering],
 ];
 
-function calculateScore(checks: ScanResult[]): ScoreData {
+function calculateScore(checks: CheckResult[]): ScoreData {
   let score = 100;
   let criticalCount = 0;
   let highCount = 0;
@@ -370,22 +373,10 @@ function calculateScore(checks: ScanResult[]): ScoreData {
     for (const f of check.findings) {
       totalFindings++;
       switch (f.severity) {
-        case "critical":
-          score -= 25;
-          criticalCount++;
-          break;
-        case "high":
-          score -= 15;
-          highCount++;
-          break;
-        case "medium":
-          score -= 10;
-          mediumCount++;
-          break;
-        case "low":
-          score -= 5;
-          lowCount++;
-          break;
+        case "critical": score -= 25; criticalCount++; break;
+        case "high": score -= 15; highCount++; break;
+        case "medium": score -= 10; mediumCount++; break;
+        case "low": score -= 5; lowCount++; break;
       }
     }
   }
@@ -402,40 +393,14 @@ function calculateScore(checks: ScanResult[]): ScoreData {
   return { score, grade, totalFindings, criticalCount, highCount, mediumCount, lowCount };
 }
 
-export function scanPrompt(text: string): FullScanResult {
+export function scanPrompt(text: string): ScanResult {
   const truncated = text.slice(0, MAX_TEXT_LENGTH);
 
-  const checks: ScanResult[] = ALL_CHECKERS.map(([name, checker]) => {
+  const checks: CheckResult[] = ALL_CHECKERS.map(([name, checker]) => {
     const findings = checker(truncated);
-    return {
-      checkName: name,
-      passed: findings.length === 0,
-      findings,
-    };
+    return { checkName: name, passed: findings.length === 0, findings };
   });
 
   const scoreData = calculateScore(checks);
   return { checks, scoreData };
-}
-
-export function gradeColor(grade: string): string {
-  switch (grade) {
-    case "A": return "#22c55e";
-    case "B": return "#84cc16";
-    case "C": return "#eab308";
-    case "D": return "#f97316";
-    case "F": return "#ef4444";
-    default: return "#6b7280";
-  }
-}
-
-export function gradeEmoji(grade: string): string {
-  switch (grade) {
-    case "A": return "\u{1F7E2}";
-    case "B": return "\u{1F7E1}";
-    case "C": return "\u{1F7E1}";
-    case "D": return "\u{1F534}";
-    case "F": return "\u{1F534}";
-    default: return "\u26AA";
-  }
 }

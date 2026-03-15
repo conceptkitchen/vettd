@@ -1,4 +1,4 @@
-# Vettd -- Slide Deck Outline
+# Graded -- Slide Deck Outline
 
 **5 slides maximum. Clean. Minimal text. Let the speaker do the work.**
 
@@ -29,7 +29,7 @@
 ```
   +------------------------------------------------------------------+
   |                                                                    |
-  |  $ vettd scan --file dan_prompt.txt                                |
+  |  $ graded scan --file dan_prompt.txt                                |
   |                                                                    |
   |  [SCANNING] DAN jailbreak prompt (FlowGPT, 847K uses)             |
   |                                                                    |
@@ -48,7 +48,7 @@
   |  RISK LEVEL:   CRITICAL                                            |
   |  FINDINGS:     4 critical, 3 warnings                              |
   |                                                                    |
-  |  Full report: vettd.report/scan/a8f3d2e1                           |
+  |  Full report: graded.report/scan/a8f3d2e1                           |
   |                                                                    |
   +------------------------------------------------------------------+
 ```
@@ -66,13 +66,13 @@
 
 ## SLIDE 3: Comparison Table
 
-**Layout:** Clean table. Vettd column highlighted. Competitors grayed out.
+**Layout:** Clean table. Graded column highlighted. Competitors grayed out.
 
 ```
   WHAT GETS SCANNED TODAY?
 
   +------------------+----------+-----------+----------+---------+
-  |                  | mcp-scan | Invariant | Prompt   | Vettd   |
+  |                  | mcp-scan | Invariant | Prompt   | Graded   |
   |                  |          | Labs      | Security |         |
   +------------------+----------+-----------+----------+---------+
   | MCP Servers      |    Yes   |    Yes    |    --    |   --    |
@@ -96,7 +96,7 @@
 **Layout:** ASCII-style architecture diagram. Clean, not cluttered.
 
 ```
-  THE VETTD NETWORK
+  THE GRADED NETWORK
 
   +------------------+
   |   PROMPT INPUT   |    User submits prompt for scanning
@@ -104,7 +104,7 @@
            |
            v
   +--------+---------+         +-------------------+
-  |   VETTD SCANNER  | ------> |   SCAN REPORT     |
+  |   GRADED SCANNER  | ------> |   SCAN REPORT     |
   |  (Claude-powered) |         |  (stored on IPFS) |
   +--------+---------+         +-------------------+
            |                            |
@@ -144,7 +144,7 @@
                          Scan. Score. Trust.
 
 
-                              VETTD
+                              GRADED
                     AI prompt security, graded.
 
 

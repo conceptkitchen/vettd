@@ -1,5 +1,5 @@
 """
-Vettd - Claude API semantic analysis for deep scanning.
+Graded - Claude API semantic analysis for deep scanning.
 Uses the Anthropic Python SDK to analyze prompts for subtle threats.
 """
 

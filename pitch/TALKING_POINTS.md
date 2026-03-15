@@ -1,4 +1,4 @@
-# Vettd -- Q&A Talking Points
+# Graded -- Q&A Talking Points
 
 **Prep for judge questions. Know these cold. Say them like you've said them before, not like you're reading.**
 
@@ -52,7 +52,7 @@
 
 "Three: the Bittensor subnet is its own economic engine. Miners earn TAO for scanning. Validators earn TAO for verifying. The network pays for its own growth."
 
-"Long-term, the real money is trust-as-infrastructure. Prompt marketplaces integrating Vettd grades into their listings. PromptBase showing an A grade next to a prompt the same way an Airbnb shows a superhost badge. That's the platform play."
+"Long-term, the real money is trust-as-infrastructure. Prompt marketplaces integrating Graded grades into their listings. PromptBase showing an A grade next to a prompt the same way an Airbnb shows a superhost badge. That's the platform play."
 
 ---
 

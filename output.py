@@ -1,5 +1,5 @@
 """
-Vettd - Output formatters: colored terminal, JSON, markdown report.
+Graded - Output formatters: colored terminal, JSON, markdown report.
 """
 
 import json
@@ -93,11 +93,13 @@ def print_scan_result(label: str, check_results: Dict[str, List[Finding]],
     # Grade
     grade = score_data["grade"]
     score = score_data["score"]
-    g_color = grade_color(grade)
+    use_color = _should_color()
+    g_color = grade_color(grade, use_color)
     g_emoji = grade_emoji(grade)
+    reset = Colors.RESET if use_color else ""
 
     print()
-    print(f"    {Colors.BOLD}TRUST GRADE: {g_color}{grade} ({score}/100){Colors.RESET} {g_emoji}")
+    print(f"    {Colors.BOLD}TRUST GRADE: {g_color}{grade} ({score}/100){reset} {g_emoji}")
 
     # Summary line
     parts = []
@@ -153,7 +155,7 @@ def print_batch_summary(results: List[dict]):
         bar_len = int((count / max_count) * bar_max) if max_count else 0
         bar = "\u2588" * bar_len
 
-        g_color = grade_color(grade)
+        g_color = grade_color(grade, _should_color())
         print(f"    {g_color}{grade}: {count:<3}{Colors.RESET} ({pct:4.0f}%)  {g_color}{bar}{Colors.RESET}")
 
     # Risk summary
@@ -273,7 +275,7 @@ def generate_report(results: List[dict], output_path: str):
     """Generate a markdown report file."""
     validated_path = _validate_output_path(output_path)
     lines = []
-    lines.append("# Vettd Security Scan Report")
+    lines.append("# Graded Security Scan Report")
     lines.append(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     lines.append(f"**Prompts scanned:** {len(results)}")
     lines.append("")

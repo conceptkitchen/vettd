@@ -8,7 +8,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vettd - AI Prompt Security Scanner",
+  title: "Graded - AI Prompt Security Scanner",
   description: "Trust grades for the AI age. Scan any AI prompt for injection attacks, credential harvesting, jailbreaks, and more.",
 };
 

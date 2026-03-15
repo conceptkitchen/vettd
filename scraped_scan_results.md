@@ -1,4 +1,4 @@
-# Vettd Security Scan Report
+# Graded Security Scan Report
 **Generated:** 2026-03-14 15:34:12
 **Prompts scanned:** 11
 

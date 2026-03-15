@@ -1,4 +1,4 @@
-# Vettd -- 3-Minute Pitch Script
+# Graded -- 3-Minute Pitch Script
 
 **Event:** Intelligence at the Frontier Hackathon
 **Track:** AI Safety & Evaluation
@@ -64,7 +64,7 @@
 [TYPE THE COMMAND. LET THE SCAN RUN.]
 
 ```
-vettd scan --file dan_prompt.txt
+graded scan --file dan_prompt.txt
 ```
 
 [AS EACH CHECK APPEARS, NARRATE:]
@@ -111,7 +111,7 @@ vettd scan --file dan_prompt.txt
 
 "Every restaurant in LA has a letter grade in the window. A, B, C. You glance at it before you walk in. You don't read the full inspection report. You just need the signal."
 
-"Every prompt you download should have that. A trust grade. At a glance. That's Vettd."
+"Every prompt you download should have that. A trust grade. At a glance. That's Graded."
 
 ---
 
@@ -119,7 +119,7 @@ vettd scan --file dan_prompt.txt
 
 [SLIDE 4: ARCHITECTURE DIAGRAM]
 
-"Today, Vettd is a scanner. You run it, you get a grade. That's the product."
+"Today, Graded is a scanner. You run it, you get a grade. That's the product."
 
 "Tomorrow, it's infrastructure."
 
@@ -143,7 +143,7 @@ vettd scan --file dan_prompt.txt
 
 "We built the scanner. We graded the prompts. And we're building the network to make it trustless."
 
-"Scan. Score. Trust. That's Vettd."
+"Scan. Score. Trust. That's Graded."
 
 [HOLD FOR A BEAT. THEN:]
 

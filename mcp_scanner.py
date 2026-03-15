@@ -1,5 +1,5 @@
 """
-Vettd - MCP config scanner.
+Graded - MCP config scanner.
 Scans claude_desktop_config.json or .mcp.json for security issues.
 """
 

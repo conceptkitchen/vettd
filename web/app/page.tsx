@@ -110,7 +110,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="text-2xl font-bold tracking-tight">
-              <span className="text-green-500">V</span>ettd
+              <span className="text-green-500">G</span>raded
             </div>
             <span className="text-xs text-zinc-500 border border-zinc-700 px-2 py-0.5 rounded">
               v0.1.0
@@ -286,15 +286,15 @@ export default function Home() {
             <h3 className="font-bold text-sm mb-4">CLI Installation</h3>
             <div className="bg-black rounded-lg p-4 font-mono text-sm overflow-x-auto">
               <div className="text-zinc-500"># Clone and scan</div>
-              <div className="text-green-400">$ git clone https://github.com/conceptkitchen/vettd.git</div>
-              <div className="text-green-400">$ cd vettd</div>
-              <div className="text-green-400">$ python3 vettd.py scan --file prompt.txt</div>
+              <div className="text-green-400">$ git clone https://github.com/conceptkitchen/graded.git</div>
+              <div className="text-green-400">$ cd graded</div>
+              <div className="text-green-400">$ python3 graded.py scan --file prompt.txt</div>
               <div className="mt-3 text-zinc-500"># Batch scan a prompt library</div>
-              <div className="text-green-400">$ python3 vettd.py scan --dir ./prompts/</div>
+              <div className="text-green-400">$ python3 graded.py scan --dir ./prompts/</div>
               <div className="mt-3 text-zinc-500"># Deep scan with Claude AI</div>
-              <div className="text-green-400">$ python3 vettd.py scan --file prompt.txt --deep</div>
+              <div className="text-green-400">$ python3 graded.py scan --file prompt.txt --deep</div>
               <div className="mt-3 text-zinc-500"># Scan MCP config for security issues</div>
-              <div className="text-green-400">$ python3 vettd.py scan --mcp claude_desktop_config.json</div>
+              <div className="text-green-400">$ python3 graded.py scan --mcp claude_desktop_config.json</div>
             </div>
           </div>
         </div>

@@ -8,3 +8,6 @@ build/
 .venv/
 venv/
 *.report.md
+node_modules/
+.next/
+*.tsbuildinfo

@@ -1,5 +1,5 @@
 """
-Vettd - Security checkers for AI prompts and MCP configs.
+Graded - Security checkers for AI prompts and MCP configs.
 Each checker function scans for a specific threat category.
 """
 

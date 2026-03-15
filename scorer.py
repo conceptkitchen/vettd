@@ -1,5 +1,5 @@
 """
-Vettd - Trust score calculation and grading.
+Graded - Trust score calculation and grading.
 """
 
 from typing import Dict, List
@@ -74,8 +74,10 @@ def calculate_score(check_results: Dict[str, List[Finding]]) -> dict:
     }
 
 
-def grade_color(grade: str) -> str:
+def grade_color(grade: str, use_color: bool = True) -> str:
     """Return ANSI color code for a grade letter."""
+    if not use_color:
+        return ""
     if grade == "A":
         return "\033[92m"  # bright green
     elif grade == "B":

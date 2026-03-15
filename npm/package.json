@@ -1,0 +1,28 @@
+{
+  "name": "graded",
+  "version": "0.1.0",
+  "description": "AI prompt security scanner - Trust grades for the AI age",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "ai",
+    "prompt-injection",
+    "scanner",
+    "trust-grade",
+    "llm"
+  ]
+}
