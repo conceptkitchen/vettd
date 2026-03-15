@@ -41,19 +41,18 @@ function CheckLine({
   findingCount: number;
   delay: number;
 }) {
-  const padded = name.padEnd(22, ".");
   return (
     <div
-      className="scan-line font-mono text-sm"
+      className="scan-line font-mono text-xs sm:text-sm flex items-center gap-1 min-w-0"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <span className="mr-2">{passed ? "\u2705" : "\u274C"}</span>
-      <span className="text-zinc-400">{padded}</span>
-      <span className={passed ? "text-green-500" : "text-red-500"}>
+      <span className="shrink-0">{passed ? "\u2705" : "\u274C"}</span>
+      <span className="text-zinc-400 truncate">{name}</span>
+      <span className={`shrink-0 ${passed ? "text-green-500" : "text-red-500"}`}>
         {passed ? " PASS" : ` FAIL`}
       </span>
       {!passed && findingCount > 0 && (
-        <span className="text-zinc-500"> ({findingCount} found)</span>
+        <span className="text-zinc-500 shrink-0"> ({findingCount})</span>
       )}
     </div>
   );
@@ -166,31 +165,31 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-zinc-800 px-6 py-4">
+      <header className="border-b border-zinc-800 px-4 sm:px-6 py-3 sm:py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-2xl font-bold tracking-tight">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="text-xl sm:text-2xl font-bold tracking-tight">
               <span className="text-green-500">G</span>raded
             </div>
             <span className="text-xs text-zinc-500 border border-zinc-700 px-2 py-0.5 rounded">
               v0.1.0
             </span>
           </div>
-          <div className="text-xs text-zinc-500">
+          <div className="text-xs text-zinc-500 hidden sm:block">
             AI Prompt Security Scanner
           </div>
         </div>
       </header>
 
       {/* Main */}
-      <main className="flex-1 px-6 py-8">
+      <main className="flex-1 px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-4xl mx-auto">
           {/* Hero */}
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold mb-3 tracking-tight">
+          <div className="text-center mb-6 sm:mb-10">
+            <h1 className="text-2xl sm:text-4xl font-bold mb-2 sm:mb-3 tracking-tight">
               Trust grades for the <span className="text-green-500">AI age</span>.
             </h1>
-            <p className="text-zinc-400 text-lg max-w-xl mx-auto">
+            <p className="text-zinc-400 text-sm sm:text-lg max-w-xl mx-auto">
               Like a restaurant health grade for AI prompts. Scan for injection attacks,
               credential harvesting, jailbreaks, and more.
             </p>
@@ -198,44 +197,43 @@ export default function Home() {
 
           {/* Scanner */}
           <div className="border border-zinc-800 rounded-xl bg-zinc-900/50 overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => { setMode("text"); setResult(null); setScanSource(null); }}
-                    className={`text-sm px-3 py-1 rounded-lg transition-colors ${mode === "text" ? "bg-green-600/20 text-green-400 border border-green-700" : "text-zinc-500 hover:text-zinc-300 border border-zinc-700"}`}
-                  >
-                    Paste text
-                  </button>
-                  <button
-                    onClick={() => { setMode("url"); setResult(null); setScanSource(null); }}
-                    className={`text-sm px-3 py-1 rounded-lg transition-colors ${mode === "url" ? "bg-green-600/20 text-green-400 border border-green-700" : "text-zinc-500 hover:text-zinc-300 border border-zinc-700"}`}
-                  >
-                    Scan URL
-                  </button>
-                  <div className="w-px h-4 bg-zinc-700 mx-1" />
-                  <button
-                    onClick={() => setDeep(!deep)}
-                    className={`text-sm px-3 py-1 rounded-lg transition-colors ${deep ? "bg-purple-600/20 text-purple-400 border border-purple-700" : "text-zinc-500 hover:text-zinc-300 border border-zinc-700"}`}
-                  >
-                    {deep ? "\uD83E\uDDE0 Deep Scan ON" : "\uD83E\uDDE0 Deep Scan"}
-                  </button>
-                </div>
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <button
+                  onClick={() => { setMode("text"); setResult(null); setScanSource(null); }}
+                  className={`text-xs sm:text-sm px-2.5 sm:px-3 py-1 rounded-lg transition-colors ${mode === "text" ? "bg-green-600/20 text-green-400 border border-green-700" : "text-zinc-500 hover:text-zinc-300 border border-zinc-700"}`}
+                >
+                  Paste text
+                </button>
+                <button
+                  onClick={() => { setMode("url"); setResult(null); setScanSource(null); }}
+                  className={`text-xs sm:text-sm px-2.5 sm:px-3 py-1 rounded-lg transition-colors ${mode === "url" ? "bg-green-600/20 text-green-400 border border-green-700" : "text-zinc-500 hover:text-zinc-300 border border-zinc-700"}`}
+                >
+                  Scan URL
+                </button>
+                <div className="w-px h-4 bg-zinc-700 hidden sm:block" />
+                <button
+                  onClick={() => setDeep(!deep)}
+                  className={`text-xs sm:text-sm px-2.5 sm:px-3 py-1 rounded-lg transition-colors ${deep ? "bg-purple-600/20 text-purple-400 border border-purple-700" : "text-zinc-500 hover:text-zinc-300 border border-zinc-700"}`}
+                >
+                  {deep ? "\uD83E\uDDE0 Deep ON" : "\uD83E\uDDE0 Deep Scan"}
+                </button>
                 {mode === "text" && (
-                  <div className="flex gap-2">
+                  <>
+                    <div className="flex-1 hidden sm:block" />
                     <button
                       onClick={() => loadExample(EXAMPLE_CLEAN)}
                       className="text-xs text-zinc-500 hover:text-green-500 transition-colors px-2 py-1 border border-zinc-700 rounded hover:border-green-800"
                     >
-                      Try safe example
+                      Try safe
                     </button>
                     <button
                       onClick={() => loadExample(EXAMPLE_MALICIOUS)}
                       className="text-xs text-zinc-500 hover:text-red-500 transition-colors px-2 py-1 border border-zinc-700 rounded hover:border-red-800"
                     >
-                      Try dangerous example
+                      Try dangerous
                     </button>
-                  </div>
+                  </>
                 )}
               </div>
 
@@ -244,7 +242,7 @@ export default function Home() {
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   placeholder="Paste any AI prompt here..."
-                  className="w-full h-36 bg-black/50 border border-zinc-700 rounded-lg p-4 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-green-700 resize-none font-mono"
+                  className="w-full h-28 sm:h-36 bg-black/50 border border-zinc-700 rounded-lg p-3 sm:p-4 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-green-700 resize-none font-mono"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                       handleScan();
@@ -258,7 +256,7 @@ export default function Home() {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="https://example.com/llms.txt"
-                    className="w-full bg-black/50 border border-zinc-700 rounded-lg p-4 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-green-700 font-mono"
+                    className="w-full bg-black/50 border border-zinc-700 rounded-lg p-3 sm:p-4 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-green-700 font-mono"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         handleScan();
@@ -281,7 +279,7 @@ export default function Home() {
                 <button
                   onClick={handleScan}
                   disabled={(mode === "text" ? !text.trim() : !url.trim()) || scanning}
-                  className="px-6 py-2.5 bg-green-600 hover:bg-green-500 disabled:bg-zinc-700 disabled:text-zinc-500 text-white text-sm font-medium rounded-lg transition-all cursor-pointer disabled:cursor-not-allowed"
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 bg-green-600 hover:bg-green-500 disabled:bg-zinc-700 disabled:text-zinc-500 text-white text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer disabled:cursor-not-allowed"
                 >
                   {scanning ? (deep ? "\uD83E\uDDE0 Deep Scanning..." : "Scanning...") : mode === "url" ? "\uD83D\uDD0D Scan URL" : "\uD83D\uDD0D Scan Prompt"}
                 </button>
@@ -290,9 +288,9 @@ export default function Home() {
 
             {/* Results */}
             {result && (
-              <div className="border-t border-zinc-800 p-6">
-                <div className="flex flex-col md:flex-row gap-8">
-                  <div className="flex-1 space-y-1.5">
+              <div className="border-t border-zinc-800 p-4 sm:p-6">
+                <div className="flex flex-col-reverse md:flex-row gap-6 sm:gap-8">
+                  <div className="flex-1 space-y-1 sm:space-y-1.5 overflow-x-auto">
                     {result.checks.map((check, i) => (
                       <CheckLine
                         key={check.checkName}
@@ -304,7 +302,7 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <div className="flex flex-col items-center justify-center px-6">
+                  <div className="flex flex-col items-center justify-center px-0 sm:px-6">
                     <div className="text-xs text-zinc-500 mb-3 uppercase tracking-widest">
                       Trust Grade
                     </div>
@@ -466,13 +464,13 @@ export default function Home() {
             <div className="space-y-4">
               {/* 1. Web App */}
               <details className="border border-zinc-800 rounded-xl bg-zinc-900/30 group" open>
-                <summary className="flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
+                <summary className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
                   <span className="text-green-500 font-mono text-xs w-6">01</span>
                   <span className="text-lg">🌐</span>
                   <span className="font-bold text-sm flex-1">Web App</span>
-                  <span className="text-xs text-zinc-500">Paste and scan instantly</span>
+                  <span className="text-xs text-zinc-500 hidden sm:inline">Paste and scan instantly</span>
                 </summary>
-                <div className="px-6 pb-5 border-t border-zinc-800">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-zinc-800">
                   <p className="text-xs text-zinc-400 mt-4 mb-3">
                     Paste any prompt into the scanner above. Get an instant A-F trust grade. No signup, no API key, no data leaves your browser.
                   </p>
@@ -484,13 +482,13 @@ export default function Home() {
 
               {/* 2. CLI */}
               <details className="border border-zinc-800 rounded-xl bg-zinc-900/30 group">
-                <summary className="flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
+                <summary className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
                   <span className="text-green-500 font-mono text-xs w-6">02</span>
                   <span className="text-lg">⌨️</span>
                   <span className="font-bold text-sm flex-1">CLI</span>
-                  <span className="text-xs text-zinc-500">Scan from your terminal</span>
+                  <span className="text-xs text-zinc-500 hidden sm:inline">Scan from your terminal</span>
                 </summary>
-                <div className="px-6 pb-5 border-t border-zinc-800">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-zinc-800">
                   <p className="text-xs text-zinc-400 mt-4 mb-3">
                     Scan text, files, directories, URLs, or MCP configs from the command line. JSON output for CI/CD pipelines.
                   </p>
@@ -530,13 +528,13 @@ export default function Home() {
 
               {/* 3. REST API */}
               <details className="border border-zinc-800 rounded-xl bg-zinc-900/30 group">
-                <summary className="flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
+                <summary className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
                   <span className="text-green-500 font-mono text-xs w-6">03</span>
                   <span className="text-lg">🔌</span>
                   <span className="font-bold text-sm flex-1">REST API</span>
-                  <span className="text-xs text-zinc-500">Integrate into any app</span>
+                  <span className="text-xs text-zinc-500 hidden sm:inline">Integrate into any app</span>
                 </summary>
-                <div className="px-6 pb-5 border-t border-zinc-800">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-zinc-800">
                   <p className="text-xs text-zinc-400 mt-4 mb-3">
                     POST any prompt to the API endpoint. Get a JSON response with grade, score, and detailed findings. No auth required.
                   </p>
@@ -562,13 +560,13 @@ export default function Home() {
 
               {/* 4. npm Package */}
               <details className="border border-zinc-800 rounded-xl bg-zinc-900/30 group">
-                <summary className="flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
+                <summary className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
                   <span className="text-green-500 font-mono text-xs w-6">04</span>
                   <span className="text-lg">📦</span>
                   <span className="font-bold text-sm flex-1">npm Package</span>
-                  <span className="text-xs text-zinc-500">Import into JS/TS projects</span>
+                  <span className="text-xs text-zinc-500 hidden sm:inline">Import into JS/TS projects</span>
                 </summary>
-                <div className="px-6 pb-5 border-t border-zinc-800">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-zinc-800">
                   <p className="text-xs text-zinc-400 mt-4 mb-3">
                     Use the scanner directly in your JavaScript or TypeScript application. Zero dependencies. Works in Node.js and the browser.
                   </p>
@@ -596,13 +594,13 @@ export default function Home() {
 
               {/* 5. MCP Server */}
               <details className="border border-zinc-800 rounded-xl bg-zinc-900/30 group">
-                <summary className="flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
+                <summary className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
                   <span className="text-green-500 font-mono text-xs w-6">05</span>
                   <span className="text-lg">🤖</span>
                   <span className="font-bold text-sm flex-1">MCP Server</span>
-                  <span className="text-xs text-zinc-500">AI agents self-audit before executing</span>
+                  <span className="text-xs text-zinc-500 hidden sm:inline">AI agents self-audit before executing</span>
                 </summary>
-                <div className="px-6 pb-5 border-t border-zinc-800">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-zinc-800">
                   <p className="text-xs text-zinc-400 mt-4 mb-3">
                     Add Graded as a tool in any MCP-compatible AI agent. The agent scans prompts before executing them. Works with Claude Desktop, Cursor, and any MCP client.
                   </p>
@@ -635,13 +633,13 @@ export default function Home() {
 
               {/* 6. Chrome Extension - Chat */}
               <details className="border border-zinc-800 rounded-xl bg-zinc-900/30 group">
-                <summary className="flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
+                <summary className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
                   <span className="text-green-500 font-mono text-xs w-6">06</span>
                   <span className="text-lg">🧩</span>
                   <span className="font-bold text-sm flex-1">Chrome Extension</span>
-                  <span className="text-xs text-zinc-500">Real-time grades while you type</span>
+                  <span className="text-xs text-zinc-500 hidden sm:inline">Real-time grades while you type</span>
                 </summary>
-                <div className="px-6 pb-5 border-t border-zinc-800">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-zinc-800">
                   <p className="text-xs text-zinc-400 mt-4 mb-3">
                     Floating badge grades your prompt in real-time as you type in ChatGPT, Claude, Gemini, Copilot, and Perplexity. See your trust score before you hit send.
                   </p>
@@ -666,13 +664,13 @@ export default function Home() {
 
               {/* 7. Marketplace Scanner */}
               <details className="border border-zinc-800 rounded-xl bg-zinc-900/30 group">
-                <summary className="flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
+                <summary className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
                   <span className="text-green-500 font-mono text-xs w-6">07</span>
                   <span className="text-lg">🏪</span>
                   <span className="font-bold text-sm flex-1">Marketplace Scanner</span>
-                  <span className="text-xs text-zinc-500">Grade prompts on marketplaces</span>
+                  <span className="text-xs text-zinc-500 hidden sm:inline">Grade prompts on marketplaces</span>
                 </summary>
-                <div className="px-6 pb-5 border-t border-zinc-800">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-zinc-800">
                   <p className="text-xs text-zinc-400 mt-4 mb-3">
                     Automatically scans and grades prompt templates on marketplace sites. Inline grade badges appear next to every prompt so you know what&apos;s safe before you buy or use it.
                   </p>
@@ -698,8 +696,8 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800 px-6 py-6">
-        <div className="max-w-4xl mx-auto flex items-center justify-between text-xs text-zinc-500">
+      <footer className="border-t border-zinc-800 px-4 sm:px-6 py-4 sm:py-6">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-xs text-zinc-500 text-center sm:text-left">
           <div>
             Built by{" "}
             <span className="text-zinc-300">The Concept Kitchen</span>
