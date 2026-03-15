@@ -31,7 +31,7 @@ Graded scans prompts with a **two-layer defense architecture** and returns an in
 ### Two-Layer Defense
 
 - **Layer 1 -- Regex Engine:** 185+ attack patterns (120 base + 65 from [Augustus](https://github.com/praetorian-inc/augustus) open source library). Fast. Deterministic. Immune to prompt injection by design.
-- **Layer 2 -- AI Deep Scan:** Claude-powered semantic analysis catches what regex can't. Multi-step attacks, subtle manipulation, context-aware threats.
+- **Layer 2 -- AI Deep Scan:** Multi-model semantic analysis powered by [Kalibr](https://kalibr.systems) outcome-aware routing. Kalibr uses Thompson Sampling to route scans across Claude, GPT-4o, and Gemini, learning which model catches the most threats in production and optimizing for accuracy and cost automatically.
 - **Auto-Learning:** Novel deep scan findings automatically generate new regex patterns, validated against clean examples before acceptance. The scanner gets smarter every scan.
 - **Trust anchor:** The AI layer can never override the regex layer. Scores can only go down, never up.
 
@@ -207,7 +207,7 @@ mcp_scanner.py             MCP config scanning
 web/                       Next.js web app + REST API
   app/lib/scanner.ts       TypeScript scanner (base + Augustus)
   app/lib/augustus-patterns.ts  65 open source patterns
-  app/lib/deep-scanner.ts  Claude deep scan integration
+  app/lib/deep-scanner.ts  Kalibr-routed multi-model deep scan
   app/lib/pattern-learner.ts   Auto-learning pattern system
   app/api/scan/route.ts    Scan API endpoint
   app/api/patterns/route.ts    Pattern library endpoint
@@ -237,13 +237,15 @@ python3 graded.py scan --dir ./prompts/ --json || echo "BLOCKED"
 
 ## Built At
 
-**Intelligence at the Frontier Hackathon 2026** -- PL_Genesis: Frontiers of Collaboration
+**PL_Genesis: Frontiers of Collaboration Hackathon 2026** -- Protocol Labs
 
 AI Safety & Evaluation Track
 
+Powered by [Kalibr](https://kalibr.systems) for multi-model routing optimization.
+
 Built by [RJ Moscardon](https://github.com/conceptkitchen) + [Clawdia](https://github.com/conceptkitchen) (AI co-builder)
 
-One person + AI = 7 deployment surfaces, 185+ attack patterns, two-layer defense architecture, auto-learning pattern system. Built in one hackathon session.
+One person + AI = 7 deployment surfaces, 185+ attack patterns, Kalibr-routed multi-model defense, auto-learning pattern system. Built in one hackathon session.
 
 ## License
 
