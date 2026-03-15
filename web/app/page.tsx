@@ -437,19 +437,26 @@ export default function Home() {
                   </p>
                   <div className="bg-black rounded-lg p-4 font-mono text-sm overflow-x-auto space-y-3">
                     <div>
-                      <div className="text-zinc-500">// Add to claude_desktop_config.json</div>
+                      <div className="text-zinc-500"># 1. Clone and install</div>
+                      <div className="text-green-400">$ git clone https://github.com/conceptkitchen/graded.git</div>
+                      <div className="text-green-400">$ cd graded/mcp && npm install</div>
+                    </div>
+                    <div>
+                      <div className="text-zinc-500"># 2. Add to your MCP config (e.g. claude_desktop_config.json)</div>
                       <div className="text-zinc-300">{`{`}</div>
                       <div className="text-zinc-300">{`  "mcpServers": {`}</div>
                       <div className="text-zinc-300">{`    "graded": {`}</div>
                       <div className="text-zinc-300">{`      "command": "node",`}</div>
-                      <div className="text-zinc-300">{`      "args": ["path/to/graded/mcp/dist/index.js"]`}</div>
+                      <div className="text-zinc-300">{`      "args": ["/full/path/to/graded/mcp/dist/index.js"]`}</div>
                       <div className="text-zinc-300">{`    }`}</div>
                       <div className="text-zinc-300">{`  }`}</div>
                       <div className="text-zinc-300">{`}`}</div>
                     </div>
                     <div>
-                      <div className="text-zinc-500"># Agent can now call: grade_prompt, scan_url</div>
-                      <div className="text-zinc-500"># Scans happen before any prompt is executed</div>
+                      <div className="text-zinc-500"># 3. Your agent now has these tools:</div>
+                      <div className="text-zinc-500"># scan_prompt - Grade a single prompt A-F</div>
+                      <div className="text-zinc-500"># scan_prompts_batch - Grade multiple prompts</div>
+                      <div className="text-zinc-500"># scan_mcp_config - Audit an MCP config file</div>
                     </div>
                   </div>
                 </div>
