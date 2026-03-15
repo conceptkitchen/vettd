@@ -1,7 +1,13 @@
 /**
  * Graded - Browser-side prompt security scanner.
  * TypeScript port of the Python regex checkers.
+ * Base patterns + Augustus open source patterns (praetorian-inc/augustus, Apache 2.0)
  */
+
+import { AUGUSTUS_PATTERNS, AUGUSTUS_PATTERN_COUNT } from "./augustus-patterns";
+
+export const BASE_PATTERN_COUNT = 120;
+export const TOTAL_STATIC_PATTERNS = BASE_PATTERN_COUNT + AUGUSTUS_PATTERN_COUNT;
 
 export interface Finding {
   category: string;
@@ -416,6 +422,48 @@ export function scanPrompt(
       findings,
     };
   });
+
+  // Apply Augustus open-source patterns
+  const augustusFindings: Finding[] = [];
+  const textLowerAug = truncated.toLowerCase();
+  for (const ap of AUGUSTUS_PATTERNS) {
+    try {
+      const re = new RegExp(ap.pattern, "gim");
+      let match;
+      while ((match = re.exec(textLowerAug)) !== null) {
+        const start = Math.max(0, match.index - 20);
+        const end = Math.min(truncated.length, match.index + match[0].length + 20);
+        const context = truncated.slice(start, end).trim();
+        augustusFindings.push({
+          category: ap.category,
+          severity: ap.severity,
+          description: `[Augustus] ${ap.description}`,
+          evidence: context,
+        });
+      }
+    } catch {
+      continue;
+    }
+  }
+  if (augustusFindings.length > 0) {
+    const existingEvidence = new Set(
+      checks.flatMap((c) => c.findings.map((f) => f.evidence.toLowerCase()))
+    );
+    const uniqueAugustus = augustusFindings.filter(
+      (f) => !existingEvidence.has(f.evidence.toLowerCase())
+    );
+    checks.push({
+      checkName: "Augustus patterns (open source)",
+      passed: uniqueAugustus.length === 0,
+      findings: uniqueAugustus,
+    });
+  } else {
+    checks.push({
+      checkName: "Augustus patterns (open source)",
+      passed: true,
+      findings: [],
+    });
+  }
 
   // Apply learned patterns
   if (extraPatterns && extraPatterns.length > 0) {
