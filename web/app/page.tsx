@@ -88,7 +88,7 @@ export default function Home() {
   const [scanning, setScanning] = useState(false);
   const [scanSource, setScanSource] = useState<string | null>(null);
   const [deep, setDeep] = useState(false);
-  const [deepData, setDeepData] = useState<{ findings: Array<{ category: string; severity: string; description: string; evidence: string }>; summary: string; confidence: number; error?: string; additionalFindings: number } | null>(null);
+  const [deepData, setDeepData] = useState<{ findings: Array<{ category: string; severity: string; description: string; evidence: string }>; summary: string; confidence: number; error?: string; model?: string; routedBy?: string; additionalFindings: number } | null>(null);
   const [patternLibrary, setPatternLibrary] = useState<{ base: number; learned: number; total: number; newThisScan: number } | null>(null);
 
   const handleScan = useCallback(async () => {
@@ -349,11 +349,16 @@ export default function Home() {
 
                 {deepData && (
                   <div className="mt-6 border-t border-purple-800/50 pt-4">
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
                       <span className="text-xs text-purple-400 uppercase tracking-widest font-bold">{"\uD83E\uDDE0"} AI Deep Scan</span>
                       {deepData.confidence !== null && (
                         <span className="text-xs text-zinc-500">
                           {Math.round(deepData.confidence * 100)}% confidence
+                        </span>
+                      )}
+                      {deepData.model && (
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-purple-900/40 text-purple-300">
+                          {deepData.routedBy === "kalibr" ? "⚡ Kalibr → " : ""}{deepData.model}
                         </span>
                       )}
                     </div>
@@ -704,7 +709,8 @@ export default function Home() {
             View Pitch Deck →
           </a>
           <div>
-            Intelligence at the Frontier Hackathon 2026
+            Built at PL_Genesis: Frontiers of Collaboration | Powered by{" "}
+            <span className="text-purple-400">Kalibr</span>
           </div>
         </div>
       </footer>

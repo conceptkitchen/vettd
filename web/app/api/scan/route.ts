@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { scanPrompt } from "../../lib/scanner";
-import { deepScan } from "../../lib/deep-scanner";
+import { deepScan, DeepScanResult } from "../../lib/deep-scanner";
 import { learnFromFindings, getLearnedPatternsForScanner, getLearnedPatternsCount } from "../../lib/pattern-learner";
 
 const MAX_INPUT_LENGTH = 100_000;
@@ -72,13 +72,17 @@ export async function POST(request: NextRequest) {
     let deepSummary: string | null = null;
     let deepConfidence: number | null = null;
     let deepError: string | null = null;
+    let deepModel: string | null = null;
+    let deepRoutedBy: string | null = null;
 
     if (isDeep) {
       try {
-        const deepResult = await deepScan(textToScan);
+        const deepResult: DeepScanResult = await deepScan(textToScan);
         deepFindings = deepResult.findings;
         deepSummary = deepResult.summary;
         deepConfidence = deepResult.confidence;
+        deepModel = deepResult.model || null;
+        deepRoutedBy = deepResult.routedBy || null;
       } catch (e) {
         deepError = e instanceof Error ? e.message : "Deep scan failed";
       }
@@ -174,6 +178,8 @@ export async function POST(request: NextRequest) {
         summary: deepSummary,
         confidence: deepConfidence,
         error: deepError,
+        model: deepModel,
+        routedBy: deepRoutedBy,
         additionalFindings: uniqueDeepFindings.length,
       };
     }
