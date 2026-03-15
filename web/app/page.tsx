@@ -402,11 +402,11 @@ export default function Home() {
                   </div>
                 )}
 
-                {patternLibrary && patternLibrary.learned > 0 && (
+                {patternLibrary && (
                   <div className="mt-4 border-t border-green-800/30 pt-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
                       <span className="text-xs text-green-400 font-mono">
-                        {"\uD83E\uDDEC"} Pattern Library: {patternLibrary.base} base + {patternLibrary.learned} learned = {patternLibrary.total} total
+                        {"\uD83E\uDDEC"} Pattern Library: 120 base + 65 Augustus{patternLibrary.learned > 0 ? ` + ${patternLibrary.learned} learned` : ""} = {patternLibrary.total} total
                       </span>
                       {patternLibrary.newThisScan > 0 && (
                         <span className="text-xs bg-green-900/50 text-green-300 px-2 py-0.5 rounded-full animate-pulse">
@@ -425,8 +425,8 @@ export default function Home() {
             {[
               {
                 icon: "\uD83D\uDD0D",
-                title: "8 Security Checks",
-                desc: "Jailbreaks, injection overrides, data exfiltration, credential harvesting, hidden text, obfuscated payloads, privilege escalation, social engineering.",
+                title: "185+ Attack Patterns",
+                desc: "120 base checks across 8 categories + 65 open source patterns from Augustus (praetorian-inc). Covers DAN jailbreaks, ChatML injection, payload splitting, RAG poisoning, steganography, and more.",
               },
               {
                 icon: "\uD83C\uDFC6",
@@ -435,8 +435,8 @@ export default function Home() {
               },
               {
                 icon: "\uD83E\uDDE0",
-                title: "AI Deep Scan",
-                desc: "Optional Claude-powered semantic analysis catches what regex can't. Multi-step attack chains, subtle manipulation, context-aware threats.",
+                title: "AI Deep Scan + Auto-Learn",
+                desc: "Claude-powered semantic analysis catches what regex can't. Novel findings automatically become new regex patterns. The scanner gets smarter every scan.",
               },
             ].map((card) => (
               <div
