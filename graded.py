@@ -55,10 +55,14 @@ def scan_text(text: str, label: str = "inline text",
     # Deep scan if requested
     deep_result = None
     if deep:
-        from deep_scan import deep_scan
-        deep_result = deep_scan(text)
-        if deep_result and deep_result.get("findings"):
-            check_results["Semantic analysis (AI)"] = deep_result["findings"]
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            print("  ⚠️  Deep scan requires ANTHROPIC_API_KEY. Running static scan only.",
+                  file=sys.stderr)
+        else:
+            from deep_scan import deep_scan
+            deep_result = deep_scan(text)
+            if deep_result and deep_result.get("findings"):
+                check_results["Semantic analysis (AI)"] = deep_result["findings"]
 
     score_data = calculate_score(check_results)
 
@@ -144,7 +148,7 @@ def scan_directory(dir_path: str, deep: bool = False, verbose: bool = False,
 
 def scan_mcp(config_path: str, verbose: bool = False) -> dict:
     """Scan an MCP config file. Returns result dict."""
-    path = Path(config_path)
+    path = Path(config_path).expanduser()
     if not path.exists():
         print(f"  Error: Config not found: {config_path}", file=sys.stderr)
         sys.exit(1)

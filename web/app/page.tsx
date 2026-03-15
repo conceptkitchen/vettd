@@ -442,7 +442,7 @@ export default function Home() {
                       <div className="text-zinc-300">{`  "mcpServers": {`}</div>
                       <div className="text-zinc-300">{`    "graded": {`}</div>
                       <div className="text-zinc-300">{`      "command": "node",`}</div>
-                      <div className="text-zinc-300">{`      "args": ["path/to/graded/mcp-server.js"]`}</div>
+                      <div className="text-zinc-300">{`      "args": ["path/to/graded/mcp/dist/index.js"]`}</div>
                       <div className="text-zinc-300">{`    }`}</div>
                       <div className="text-zinc-300">{`  }`}</div>
                       <div className="text-zinc-300">{`}`}</div>
