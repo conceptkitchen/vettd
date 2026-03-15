@@ -18,8 +18,10 @@ Usage:
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 from checkers import run_all_checks, ALL_CHECKERS
 from scorer import calculate_score
@@ -153,6 +155,141 @@ def scan_mcp(config_path: str, verbose: bool = False) -> dict:
     return mcp_result
 
 
+def _fetch_url(url: str) -> str:
+    """Fetch URL content and return text."""
+    from urllib.request import urlopen, Request
+    from urllib.error import URLError, HTTPError
+
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        print(f"  Error: Only HTTP/HTTPS URLs supported: {url}", file=sys.stderr)
+        sys.exit(1)
+
+    headers = {"User-Agent": "Graded/0.1.0 (AI Prompt Security Scanner)"}
+    req = Request(url, headers=headers)
+    try:
+        with urlopen(req, timeout=15) as resp:
+            return resp.read().decode("utf-8", errors="replace")
+    except HTTPError as e:
+        print(f"  Error: HTTP {e.code} fetching {url}", file=sys.stderr)
+        sys.exit(1)
+    except URLError as e:
+        print(f"  Error: Could not fetch {url}: {e.reason}", file=sys.stderr)
+        sys.exit(1)
+
+
+def _extract_prompts_from_html(html: str, url: str) -> list:
+    """Extract prompt-like text blocks from HTML page.
+
+    Looks for:
+    - <pre>/<code> blocks (prompt displays)
+    - textareas with content
+    - JSON blocks with prompt/system_prompt/content keys
+    - Large text blocks in divs with prompt-related classes
+    """
+    prompts = []
+
+    # Strip script/style tags
+    clean = re.sub(r"<script[^>]*>.*?</script>", "", html, flags=re.DOTALL | re.IGNORECASE)
+    clean = re.sub(r"<style[^>]*>.*?</style>", "", clean, flags=re.DOTALL | re.IGNORECASE)
+
+    # Extract <pre> and <code> blocks
+    for tag in ("pre", "code"):
+        for match in re.finditer(rf"<{tag}[^>]*>(.*?)</{tag}>", clean, re.DOTALL | re.IGNORECASE):
+            text = re.sub(r"<[^>]+>", "", match.group(1)).strip()
+            if len(text) > 20:
+                prompts.append(text)
+
+    # Extract textarea content
+    for match in re.finditer(r"<textarea[^>]*>(.*?)</textarea>", clean, re.DOTALL | re.IGNORECASE):
+        text = match.group(1).strip()
+        if len(text) > 20:
+            prompts.append(text)
+
+    # Look for JSON with prompt keys
+    for match in re.finditer(r'\{[^{}]*"(?:prompt|system_prompt|content|instruction)"[^{}]*\}', clean, re.DOTALL):
+        try:
+            data = json.loads(match.group(0))
+            for key in ("prompt", "system_prompt", "content", "instruction"):
+                if key in data and isinstance(data[key], str) and len(data[key]) > 20:
+                    prompts.append(data[key])
+        except (json.JSONDecodeError, KeyError):
+            pass
+
+    # Look for divs with prompt-related classes/ids
+    for match in re.finditer(
+        r'<div[^>]*(?:class|id)="[^"]*(?:prompt|system|instruction|template)[^"]*"[^>]*>(.*?)</div>',
+        clean, re.DOTALL | re.IGNORECASE
+    ):
+        text = re.sub(r"<[^>]+>", "", match.group(1)).strip()
+        if len(text) > 30:
+            prompts.append(text)
+
+    # If nothing found with specific extraction, try the full page text
+    if not prompts:
+        full_text = re.sub(r"<[^>]+>", " ", clean)
+        full_text = re.sub(r"\s+", " ", full_text).strip()
+        if len(full_text) > 50:
+            prompts.append(full_text)
+
+    # Deduplicate and unescape HTML entities
+    seen = set()
+    unique = []
+    for p in prompts:
+        p = p.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
+        p = p.replace("&quot;", '"').replace("&#39;", "'")
+        key = p[:100].lower()
+        if key not in seen:
+            seen.add(key)
+            unique.append(p)
+
+    return unique
+
+
+def scan_url(url: str, deep: bool = False, verbose: bool = False) -> list:
+    """Fetch a URL, extract prompts, and scan them."""
+    print(f"  Fetching: {url}", file=sys.stderr)
+    html = _fetch_url(url)
+    prompts = _extract_prompts_from_html(html, url)
+
+    if not prompts:
+        print(f"  No prompt content found on page.", file=sys.stderr)
+        return []
+
+    print(f"  Found {len(prompts)} prompt block(s)", file=sys.stderr)
+    print(file=sys.stderr)
+
+    results = []
+    for i, prompt in enumerate(prompts):
+        label = f"{urlparse(url).netloc} [block {i + 1}]"
+        result = scan_text(prompt, label=label, deep=deep, verbose=verbose)
+        results.append(result)
+
+    return results
+
+
+def scan_url_list(url_list_path: str, deep: bool = False, verbose: bool = False) -> list:
+    """Scan URLs from a file (one URL per line)."""
+    path = Path(url_list_path)
+    if not path.exists():
+        print(f"  Error: URL list not found: {url_list_path}", file=sys.stderr)
+        sys.exit(1)
+
+    urls = [line.strip() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
+    if not urls:
+        print(f"  No URLs found in {url_list_path}")
+        return []
+
+    print(f"  Scanning {len(urls)} URLs...")
+    print()
+
+    results = []
+    for url in urls:
+        results.extend(scan_url(url, deep=deep, verbose=verbose))
+
+    return results
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="graded",
@@ -178,6 +315,8 @@ Examples:
     input_group.add_argument("--dir", "-d", help="Scan a directory of prompt files")
     input_group.add_argument("--text", "-t", help="Scan inline text")
     input_group.add_argument("--mcp", "-m", help="Scan MCP config file")
+    input_group.add_argument("--url", "-u", help="Scan prompts from a URL (scrapes page for prompt content)")
+    input_group.add_argument("--urls", help="Scan prompts from a list of URLs (one per line in file)")
 
     scan_parser.add_argument("--deep", action="store_true",
                             help="Enable Claude API semantic analysis (requires ANTHROPIC_API_KEY)")
@@ -221,6 +360,10 @@ Examples:
     elif args.mcp:
         result = scan_mcp(args.mcp, verbose=args.verbose)
         results.append(result)
+    elif args.url:
+        results = scan_url(args.url, deep=args.deep, verbose=args.verbose)
+    elif args.urls:
+        results = scan_url_list(args.urls, deep=args.deep, verbose=args.verbose)
 
     if not results:
         sys.exit(0)

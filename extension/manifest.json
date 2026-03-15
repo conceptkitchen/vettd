@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Graded - AI Prompt Security Scanner",
-  "version": "0.1.0",
-  "description": "Trust grades for AI prompts. Scans for jailbreaks, injection attacks, credential harvesting, and more before you hit send.",
+  "version": "0.2.0",
+  "description": "Trust grades for AI prompts. Scans for jailbreaks, injection attacks, credential harvesting, and more. Works on AI chats and prompt marketplaces.",
   "permissions": [],
   "content_scripts": [
     {
@@ -17,6 +17,21 @@
         "https://www.perplexity.ai/*"
       ],
       "js": ["scanner.js", "content.js"],
+      "css": ["badge.css"]
+    },
+    {
+      "matches": [
+        "https://flowgpt.com/*",
+        "https://www.flowgpt.com/*",
+        "https://promptbase.com/*",
+        "https://www.promptbase.com/*",
+        "https://smith.langchain.com/*",
+        "https://github.com/*/prompts*",
+        "https://github.com/*/prompt*",
+        "https://huggingface.co/*",
+        "https://www.aimodels.fyi/*"
+      ],
+      "js": ["scanner.js", "marketplace.js"],
       "css": ["badge.css"]
     }
   ],
