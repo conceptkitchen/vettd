@@ -22,15 +22,19 @@ export async function POST(request: NextRequest) {
 
     if (body.url && typeof body.url === "string") {
       try {
-        const parsed = new URL(body.url);
+        let rawUrl = body.url.trim();
+        if (!/^https?:\/\//i.test(rawUrl)) {
+          rawUrl = "https://" + rawUrl;
+        }
+        const parsed = new URL(rawUrl);
         if (!["http:", "https:"].includes(parsed.protocol)) {
           return NextResponse.json(
             { error: "Only HTTP/HTTPS URLs supported" },
             { status: 400 }
           );
         }
-        textToScan = await fetchUrlContent(body.url);
-        source = body.url;
+        textToScan = await fetchUrlContent(rawUrl);
+        source = rawUrl;
       } catch (e) {
         return NextResponse.json(
           { error: `Failed to fetch URL: ${e instanceof Error ? e.message : "unknown error"}` },

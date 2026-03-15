@@ -108,7 +108,7 @@ export default function Home() {
         const res = await fetch("/api/scan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: url.trim() }),
+          body: JSON.stringify({ url: /^https?:\/\//i.test(url.trim()) ? url.trim() : "https://" + url.trim() }),
         });
         const data = await res.json();
         if (data.error) {
