@@ -700,6 +700,9 @@ export default function Home() {
             Built by{" "}
             <span className="text-zinc-300">The Concept Kitchen</span>
           </div>
+          <a href="/pitch" className="text-green-500 hover:text-green-400 transition-colors">
+            View Pitch Deck →
+          </a>
           <div>
             Intelligence at the Frontier Hackathon 2026
           </div>
