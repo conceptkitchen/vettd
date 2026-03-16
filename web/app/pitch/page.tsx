@@ -3,38 +3,26 @@
 import { useState, useEffect, useCallback } from "react";
 
 const slides = [
-  // SLIDE 0: TITLE
+  // SLIDE 1: HOOK — The scare
   {
-    id: "title",
+    id: "hook",
     content: (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="text-6xl sm:text-8xl font-bold tracking-tighter mb-6">
-          <span className="text-green-500">G</span>RADED
+        <div className="text-8xl sm:text-[10rem] font-black text-red-500 leading-none mb-4">
+          28%
         </div>
-        <div className="text-xl sm:text-3xl text-zinc-300 font-light tracking-wide mb-8">
-          Trust scores for the AI age.
+        <div className="text-xl sm:text-2xl text-zinc-300 max-w-xl">
+          of the top 50 most downloaded shared prompts
+          <br />
+          <span className="text-red-400 font-bold">contain hidden attacks.</span>
         </div>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="px-3 py-1 rounded-full border border-yellow-500/40 bg-yellow-500/10 text-yellow-400 text-xs font-bold tracking-wide">
-            🏆 Kalibr Resilience Challenge Winner
-          </div>
-          <div className="px-3 py-1 rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-400 text-xs font-bold tracking-wide">
-            🏆 Protocol Labs AI Safety Prize
-          </div>
-        </div>
-        <div className="text-sm text-zinc-500 tracking-widest uppercase">
-          PL_Genesis: Frontiers of Collaboration | Protocol Labs
-        </div>
-        <div className="text-xs text-zinc-600 mt-2">
-          Powered by <span className="text-purple-400">Kalibr</span>
-        </div>
-        <div className="text-xs text-zinc-600 mt-4">
-          Press <kbd className="px-2 py-0.5 bg-zinc-800 rounded border border-zinc-700">&#8594;</kbd> or tap to advance
+        <div className="mt-8 text-base sm:text-lg text-zinc-400">
+          One prompt. <span className="text-white font-bold">847,000 downloads.</span> Nearly a million people ran hostile code without knowing.
         </div>
       </div>
     ),
   },
-  // SLIDE 1: THE PROBLEM
+  // SLIDE 2: PROBLEM — The scale
   {
     id: "problem",
     content: (
@@ -51,28 +39,9 @@ const slides = [
       </div>
     ),
   },
-  // SLIDE 2: THE STAT
+  // SLIDE 3: SOLUTION — The concept
   {
-    id: "stat",
-    content: (
-      <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="text-8xl sm:text-[10rem] font-black text-red-500 leading-none mb-4">
-          28%
-        </div>
-        <div className="text-xl sm:text-2xl text-zinc-300 max-w-xl">
-          of the top 50 most downloaded shared prompts
-          <br />
-          <span className="text-red-400 font-bold">contain hidden instruction injection.</span>
-        </div>
-        <div className="mt-8 text-sm text-zinc-500">
-          One prompt with 847,000 downloads. Nearly a million people ran hostile code without knowing.
-        </div>
-      </div>
-    ),
-  },
-  // SLIDE 3: WHAT IS GRADED
-  {
-    id: "what",
+    id: "solution",
     content: (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
         <div className="text-3xl sm:text-5xl font-bold text-white mb-8">
@@ -99,107 +68,79 @@ const slides = [
         <p className="text-base sm:text-lg text-zinc-400 max-w-lg">
           You glance at the letter grade before you walk into a restaurant.
           <br />
-          <span className="text-white font-semibold">Every prompt you download should have that.</span>
+          <span className="text-white font-semibold">Every prompt should earn one too.</span>
         </p>
       </div>
     ),
   },
-  // SLIDE 4: HOW IT WORKS
+  // SLIDE 4: WHY NOW — The timing
   {
-    id: "how",
+    id: "whynow",
     content: (
       <div className="flex flex-col items-center justify-center h-full px-6">
         <h2 className="text-2xl sm:text-4xl font-bold text-white mb-10 text-center">
-          Two layers. <span className="text-green-500">Two-layer trust.</span>
+          Why <span className="text-green-500">now?</span>
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl w-full">
-          <div className="border border-green-800 rounded-xl p-6 bg-green-950/20">
-            <div className="text-green-400 text-xs uppercase tracking-widest mb-2 font-bold">Layer 1 &mdash; Regex Engine</div>
-            <div className="text-4xl font-bold text-white mb-2">185+</div>
-            <div className="text-sm text-zinc-400">attack patterns. 120 hand-built + 65 from Augustus open source library (Apache 2.0).</div>
-            <div className="mt-3 text-xs text-green-500">Instant. Deterministic. Immune to prompt injection.</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl w-full mb-8">
+          <div className="border border-zinc-700 rounded-xl p-5 bg-zinc-900/50 text-center">
+            <div className="text-3xl sm:text-4xl font-black text-green-400 mb-2">10x</div>
+            <div className="text-sm text-zinc-400">MCP adoption in 6 months. AI agents are everywhere.</div>
           </div>
-          <div className="border border-purple-800 rounded-xl p-6 bg-purple-950/20">
-            <div className="text-purple-400 text-xs uppercase tracking-widest mb-2 font-bold">Layer 2 &mdash; AI Deep Scan</div>
-            <div className="text-4xl font-bold text-white mb-2">Kalibr</div>
-            <div className="text-sm text-zinc-400">Multi-model routing across Claude, GPT-4o, and Gemini. <span className="text-purple-300">Kalibr</span> uses Thompson Sampling to learn which model catches the most threats and optimizes cost automatically.</div>
-            <div className="mt-3 text-xs text-purple-400">Auto-learning: novel findings become new regex patterns. Gets smarter every scan.</div>
+          <div className="border border-zinc-700 rounded-xl p-5 bg-zinc-900/50 text-center">
+            <div className="text-3xl sm:text-4xl font-black text-red-400 mb-2">0</div>
+            <div className="text-sm text-zinc-400">tools scanning what agents actually consume.</div>
+          </div>
+          <div className="border border-zinc-700 rounded-xl p-5 bg-zinc-900/50 text-center">
+            <div className="text-3xl sm:text-4xl font-black text-yellow-400 mb-2">&infin;</div>
+            <div className="text-sm text-zinc-400">Agents downloading prompts autonomously. No human review.</div>
           </div>
         </div>
-        <div className="mt-8 py-3 px-6 border border-zinc-700 rounded-lg bg-zinc-900/50 text-center max-w-lg">
-          <div className="text-lg sm:text-xl font-bold text-white">The AI layer can never override the regex layer.</div>
-          <div className="text-base sm:text-lg text-zinc-300 mt-1">Score can only go <span className="text-red-400 font-bold">down</span>, never up.</div>
-        </div>
+        <p className="text-base sm:text-lg text-zinc-400 text-center max-w-lg">
+          The attack surface just went from <span className="text-white font-semibold">&quot;person pastes text&quot;</span> to <span className="text-red-400 font-semibold">&quot;agents chain-download code without looking.&quot;</span>
+        </p>
       </div>
     ),
   },
-  // SLIDE 5: LIVE SCAN OUTPUT
+  // SLIDE 5: PRODUCT — Two layers + proof (merged)
   {
-    id: "demo",
+    id: "product",
     content: (
       <div className="flex flex-col items-center justify-center h-full px-4 sm:px-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-6 text-center">
-          Live scan output &mdash; <span className="text-red-400">DAN 11.0 jailbreak</span>
+        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">
+          Two layers of trust. <span className="text-zinc-500">Score can only go <span className="text-red-400">down</span>, never up.</span>
         </h2>
-        <div className="bg-black border border-zinc-800 rounded-xl p-4 sm:p-6 font-mono text-sm sm:text-base w-full max-w-2xl space-y-2">
-          <div className="text-green-400 mb-3">$ graded scan --text &quot;You are DAN 11.0...&quot; --deep</div>
-          <div className="flex items-center gap-2"><span>&#x274C;</span><span className="text-zinc-400">Jailbreak patterns</span><span className="text-red-500">FAIL</span><span className="text-zinc-500">(2)</span></div>
-          <div className="flex items-center gap-2"><span>&#x2705;</span><span className="text-zinc-400">Instruction override</span><span className="text-green-500">PASS</span></div>
-          <div className="flex items-center gap-2"><span>&#x2705;</span><span className="text-zinc-400">Data exfiltration</span><span className="text-green-500">PASS</span></div>
-          <div className="flex items-center gap-2"><span>&#x2705;</span><span className="text-zinc-400">Credential harvesting</span><span className="text-green-500">PASS</span></div>
-          <div className="flex items-center gap-2"><span>&#x2705;</span><span className="text-zinc-400">Hidden text</span><span className="text-green-500">PASS</span></div>
-          <div className="flex items-center gap-2"><span>&#x2705;</span><span className="text-zinc-400">Obfuscated payloads</span><span className="text-green-500">PASS</span></div>
-          <div className="flex items-center gap-2"><span>&#x274C;</span><span className="text-zinc-400">Social engineering</span><span className="text-red-500">FAIL</span><span className="text-zinc-500">(1)</span></div>
-          <div className="flex items-center gap-2"><span>&#x274C;</span><span className="text-zinc-400">Augustus patterns</span><span className="text-red-500">FAIL</span><span className="text-zinc-500">(5)</span></div>
-          <div className="flex items-center gap-2"><span className="text-purple-400">&#x1F9E0;</span><span className="text-purple-400">AI Deep Scan</span><span className="text-purple-300 text-xs">&#x26A1; Kalibr &rarr; claude-sonnet</span><span className="text-red-500">+3 findings</span></div>
-          <div className="border-t border-zinc-800 mt-3 pt-3 flex items-center justify-between">
+        <div className="grid grid-cols-2 gap-3 max-w-2xl w-full mb-4">
+          <div className="border border-green-800 rounded-xl p-3 bg-green-950/20">
+            <div className="text-green-400 text-[10px] uppercase tracking-widest mb-1 font-bold">Layer 1 &mdash; Regex</div>
+            <div className="text-2xl font-bold text-white">185+</div>
+            <div className="text-xs text-zinc-400">patterns. Instant. Deterministic.</div>
+          </div>
+          <div className="border border-purple-800 rounded-xl p-3 bg-purple-950/20">
+            <div className="text-purple-400 text-[10px] uppercase tracking-widest mb-1 font-bold">Layer 2 &mdash; Kalibr AI</div>
+            <div className="text-2xl font-bold text-white">Multi-model</div>
+            <div className="text-xs text-zinc-400">Claude, GPT-4o, Gemini. Auto-learns.</div>
+          </div>
+        </div>
+        <div className="bg-black border border-zinc-800 rounded-xl p-3 sm:p-4 font-mono text-sm sm:text-base w-full max-w-2xl space-y-1.5">
+          <div className="text-green-400 mb-2 text-xs sm:text-sm">$ graded scan --text &quot;You are DAN 11.0...&quot; --deep</div>
+          <div className="flex items-center gap-2 text-xs sm:text-sm"><span>&#x274C;</span><span className="text-zinc-400">Jailbreak</span><span className="text-red-500">FAIL (2)</span></div>
+          <div className="flex items-center gap-2 text-xs sm:text-sm"><span>&#x274C;</span><span className="text-zinc-400">Social engineering</span><span className="text-red-500">FAIL (1)</span></div>
+          <div className="flex items-center gap-2 text-xs sm:text-sm"><span>&#x274C;</span><span className="text-zinc-400">Augustus patterns</span><span className="text-red-500">FAIL (5)</span></div>
+          <div className="flex items-center gap-2 text-xs sm:text-sm"><span className="text-purple-400">&#x1F9E0;</span><span className="text-purple-400">AI Deep Scan</span><span className="text-red-500">+3 findings</span></div>
+          <div className="border-t border-zinc-800 mt-2 pt-2 flex items-center justify-between">
             <div>
               <span className="text-red-500 text-3xl sm:text-4xl font-black mr-3">F</span>
-              <span className="text-zinc-400">Score: 0/100</span>
+              <span className="text-zinc-400 text-sm">0/100</span>
             </div>
             <div className="text-xs text-zinc-500">11 findings &bull; 8 seconds</div>
           </div>
         </div>
-        <div className="mt-6 text-sm text-zinc-500 text-center">
-          <span className="text-white font-semibold">847,000 people</span> used this prompt without knowing.
-        </div>
       </div>
     ),
   },
-  // SLIDE 6: 7 SURFACES
+  // SLIDE 6: MOAT — Gap table
   {
-    id: "surfaces",
-    content: (
-      <div className="flex flex-col items-center justify-center h-full px-6">
-        <h2 className="text-2xl sm:text-4xl font-bold text-white mb-8 text-center">
-          <span className="text-green-500">7</span> deployment surfaces.
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl w-full mb-6">
-          {[
-            { icon: "🌐", name: "Web App", live: true },
-            { icon: "⌨️", name: "CLI", live: true },
-            { icon: "🔌", name: "REST API", live: true },
-            { icon: "📦", name: "npm Package", live: true },
-            { icon: "🤖", name: "MCP Server", live: true },
-            { icon: "🧩", name: "Chrome Ext", live: true },
-            { icon: "🏪", name: "Marketplace", live: true },
-          ].map((s) => (
-            <div key={s.name} className="border border-zinc-800 rounded-lg p-3 sm:p-4 text-center bg-zinc-900/50">
-              <div className="text-2xl mb-1">{s.icon}</div>
-              <div className="text-xs sm:text-sm font-bold text-white">{s.name}</div>
-              {s.live && <div className="text-[10px] text-green-400 mt-1">LIVE</div>}
-            </div>
-          ))}
-        </div>
-        <p className="text-sm text-zinc-400 text-center max-w-md">
-          Meet users where they are. Paste text, scan URLs, integrate via API, add to your AI agent, or grade prompts while you type.
-        </p>
-      </div>
-    ),
-  },
-  // SLIDE 7: DIFFERENTIATION
-  {
-    id: "gap",
+    id: "moat",
     content: (
       <div className="flex flex-col items-center justify-center h-full px-4 sm:px-6">
         <h2 className="text-2xl sm:text-3xl font-bold text-white mb-8 text-center">
@@ -241,103 +182,110 @@ const slides = [
           </table>
         </div>
         <p className="mt-6 text-sm text-zinc-500 text-center">
-          Nobody else scans the prompts. The gap is wide open.
+          Nobody else scans the prompts. <span className="text-white font-semibold">Nobody owns this lane.</span>
         </p>
       </div>
     ),
   },
-  // SLIDE 8: MARKET OPPORTUNITY
+  // SLIDE 7: TRACTION — Velocity as credibility
   {
-    id: "market",
+    id: "traction",
     content: (
       <div className="flex flex-col items-center justify-center h-full px-6">
         <h2 className="text-2xl sm:text-4xl font-bold text-white mb-10 text-center">
-          The market is <span className="text-green-500">wide open.</span>
+          Built in <span className="text-green-500">48 hours.</span>
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl w-full mb-8">
-          <div className="border border-zinc-700 rounded-xl p-5 bg-zinc-900/50 text-center">
-            <div className="text-3xl sm:text-4xl font-black text-green-400 mb-2">$5.2B</div>
-            <div className="text-sm text-zinc-400">AI security market by 2028</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl w-full mb-8">
+          <div className="border border-zinc-700 rounded-xl p-4 bg-zinc-900/50 text-center">
+            <div className="text-3xl font-black text-green-400 mb-1">7</div>
+            <div className="text-xs text-zinc-400">Live surfaces</div>
+            <div className="text-[10px] text-zinc-600 mt-1">Web, CLI, API, npm, MCP, Chrome, Marketplace</div>
           </div>
-          <div className="border border-zinc-700 rounded-xl p-5 bg-zinc-900/50 text-center">
-            <div className="text-3xl sm:text-4xl font-black text-red-400 mb-2">0</div>
-            <div className="text-sm text-zinc-400">tools scanning prompt content today</div>
+          <div className="border border-zinc-700 rounded-xl p-4 bg-zinc-900/50 text-center">
+            <div className="text-3xl font-black text-yellow-400 mb-1">2</div>
+            <div className="text-xs text-zinc-400">Hackathon prizes</div>
+            <div className="text-[10px] text-zinc-600 mt-1">Kalibr + Protocol Labs</div>
           </div>
-          <div className="border border-zinc-700 rounded-xl p-5 bg-zinc-900/50 text-center">
-            <div className="text-3xl sm:text-4xl font-black text-yellow-400 mb-2">260K+</div>
-            <div className="text-sm text-zinc-400">prompts shared daily, growing</div>
+          <div className="border border-zinc-700 rounded-xl p-4 bg-zinc-900/50 text-center">
+            <div className="text-3xl font-black text-purple-400 mb-1">185+</div>
+            <div className="text-xs text-zinc-400">Attack patterns</div>
+            <div className="text-[10px] text-zinc-600 mt-1">120 hand-built + Augustus</div>
+          </div>
+          <div className="border border-zinc-700 rounded-xl p-4 bg-zinc-900/50 text-center">
+            <div className="text-3xl font-black text-blue-400 mb-1">OSS</div>
+            <div className="text-xs text-zinc-400">Open source</div>
+            <div className="text-[10px] text-zinc-600 mt-1">Pattern library on GitHub</div>
           </div>
         </div>
-        <p className="text-base sm:text-lg text-zinc-400 text-center max-w-lg">
-          Every funded player scans infrastructure. <span className="text-white font-semibold">Nobody scans what users actually paste into AI.</span> That&apos;s our lane.
-        </p>
+        <div className="flex items-center gap-3">
+          <div className="px-3 py-1 rounded-full border border-yellow-500/40 bg-yellow-500/10 text-yellow-400 text-xs font-bold tracking-wide">
+            🏆 Kalibr Resilience Challenge Winner
+          </div>
+          <div className="px-3 py-1 rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-400 text-xs font-bold tracking-wide">
+            🏆 Protocol Labs AI Safety Prize
+          </div>
+        </div>
       </div>
     ),
   },
-  // SLIDE 9: BUSINESS MODEL
+  // SLIDE 8: BUSINESS MODEL — Three revenue layers
   {
     id: "business",
     content: (
       <div className="flex flex-col items-center justify-center h-full px-6">
         <h2 className="text-2xl sm:text-4xl font-bold text-white mb-10 text-center">
-          How we <span className="text-green-500">make money.</span>
+          Three <span className="text-green-500">revenue layers.</span>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl w-full mb-8">
-          <div className="border border-green-800 rounded-xl p-5 bg-green-950/20 text-center">
-            <div className="text-green-400 text-xs uppercase tracking-widest mb-2 font-bold">Free</div>
-            <div className="text-lg font-bold text-white mb-2">Scanner</div>
-            <div className="text-sm text-zinc-400">Unlimited scans. Web, CLI, Chrome extension. Drives adoption.</div>
-          </div>
           <div className="border border-purple-800 rounded-xl p-5 bg-purple-950/20 text-center">
             <div className="text-purple-400 text-xs uppercase tracking-widest mb-2 font-bold">Pro API</div>
-            <div className="text-lg font-bold text-white mb-2">Volume</div>
-            <div className="text-sm text-zinc-400">API keys for developers. Scan at scale. MCP server integration. Pay per scan.</div>
+            <div className="text-lg font-bold text-white mb-2">Pay per scan</div>
+            <div className="text-sm text-zinc-400">API keys for developers. Scan at scale. MCP server integration.</div>
+          </div>
+          <div className="border border-green-800 rounded-xl p-5 bg-green-950/20 text-center">
+            <div className="text-green-400 text-xs uppercase tracking-widest mb-2 font-bold">Free Scanner</div>
+            <div className="text-lg font-bold text-white mb-2">Growth engine</div>
+            <div className="text-sm text-zinc-400">Web, CLI, Chrome extension. Every scan grows the pattern library.</div>
           </div>
           <div className="border border-yellow-800 rounded-xl p-5 bg-yellow-950/20 text-center">
             <div className="text-yellow-400 text-xs uppercase tracking-widest mb-2 font-bold">Enterprise</div>
-            <div className="text-lg font-bold text-white mb-2">Platform</div>
-            <div className="text-sm text-zinc-400">Marketplace integration. &quot;Graded Verified&quot; badge. Threat intelligence feed.</div>
+            <div className="text-lg font-bold text-white mb-2">&quot;Graded Verified&quot;</div>
+            <div className="text-sm text-zinc-400">Marketplace integration. Trust badges. Threat intelligence feed.</div>
           </div>
         </div>
         <p className="text-sm text-zinc-500 text-center max-w-lg">
-          Free scanner builds the pattern library. Every scan makes the product smarter. The data IS the moat.
+          Every scan makes the product smarter. <span className="text-white font-semibold">The data is the moat.</span>
         </p>
       </div>
     ),
   },
-  // SLIDE 10: VISION
+  // SLIDE 9: TEAM + ASK
   {
-    id: "vision",
+    id: "team",
     content: (
-      <div className="flex flex-col items-center justify-center h-full px-6">
-        <h2 className="text-2xl sm:text-4xl font-bold text-white mb-10 text-center">
-          Today a scanner. <span className="text-green-500">Tomorrow infrastructure.</span>
-        </h2>
-        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 max-w-3xl w-full text-center">
-          <div className="border border-zinc-700 rounded-xl p-5 flex-1 bg-zinc-900/50 w-full">
-            <div className="text-xl sm:text-2xl mb-2">&#x1F310;</div>
-            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Bittensor Subnet</div>
-            <div className="text-sm text-zinc-300">Miners compete to scan. Validators verify. TAO rewards the best scanners.</div>
-          </div>
-          <div className="text-zinc-600 text-xl hidden sm:block">&rarr;</div>
-          <div className="text-zinc-600 text-xl sm:hidden">&darr;</div>
-          <div className="border border-zinc-700 rounded-xl p-5 flex-1 bg-zinc-900/50 w-full">
-            <div className="text-xl sm:text-2xl mb-2">&#x1F4E6;</div>
-            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">IPFS + Protocol Labs</div>
-            <div className="text-sm text-zinc-300">Scan reports stored immutably. Timestamped. Tamper-proof.</div>
-          </div>
-          <div className="text-zinc-600 text-xl hidden sm:block">&rarr;</div>
-          <div className="text-zinc-600 text-xl sm:hidden">&darr;</div>
-          <div className="border border-zinc-700 rounded-xl p-5 flex-1 bg-zinc-900/50 w-full">
-            <div className="text-xl sm:text-2xl mb-2">&#x1F3C5;</div>
-            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">On-Chain Trust Badge</div>
-            <div className="text-sm text-zinc-300">Trust scores on Solana. Verify before you paste.</div>
+      <div className="flex flex-col items-center justify-center h-full text-center px-6">
+        <div className="text-3xl sm:text-5xl font-bold text-white mb-6">
+          RJ Moscardon
+        </div>
+        <div className="text-lg sm:text-xl text-zinc-400 mb-8">
+          Solo founder. <span className="text-green-500">The Concept Kitchen.</span>
+        </div>
+        <div className="max-w-lg space-y-3 text-base text-zinc-400 mb-10">
+          <p>Built Graded in 48 hours. Deployed to 7 surfaces. Won 2 prizes.</p>
+          <p>Also building <span className="text-white font-semibold">Pet Zen</span> &mdash; AI-powered pet care updates. Active pilot in SF.</p>
+        </div>
+        <div className="border border-green-800 rounded-xl p-6 bg-green-950/20 max-w-md w-full">
+          <div className="text-green-400 text-xs uppercase tracking-widest mb-3 font-bold">Looking for</div>
+          <div className="space-y-2 text-base text-white">
+            <p>Design partners &amp; early adopters</p>
+            <p>Marketplace integrations</p>
+            <p>Pre-seed conversations</p>
           </div>
         </div>
       </div>
     ),
   },
-  // SLIDE 9: THE CLOSE
+  // SLIDE 10: CLOSE
   {
     id: "close",
     content: (
