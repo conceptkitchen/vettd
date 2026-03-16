@@ -2,9 +2,10 @@
 /**
  * Graded MCP Server — AI prompt security scanner as an MCP tool.
  *
- * Exposes two tools:
+ * Exposes three tools:
  *   - scan_prompt: Scan a single prompt for security issues
- *   - scan_mcp_config: Scan an MCP config file for risky server definitions
+ *   - scan_url: Fetch and scan a URL (llms.txt, web pages, shared skills)
+ *   - scan_prompts_batch: Batch scan multiple prompts
  *
  * Usage in claude_desktop_config.json:
  *   {
@@ -118,7 +119,81 @@ server.tool(
   }
 );
 
-// Tool 2: Batch scan multiple prompts
+// Tool 2: Scan a URL (llms.txt, web page, shared skill)
+server.tool(
+  "scan_url",
+  "Fetch and scan a URL for prompt injection threats. Use this to scan llms.txt files, shared AI skills, web pages, or any content an agent is about to consume. Returns a trust grade (A-F) and detailed findings.",
+  {
+    url: z
+      .string()
+      .url()
+      .describe("The URL to fetch and scan (e.g. https://example.com/llms.txt)"),
+    format: z
+      .enum(["summary", "detailed"])
+      .default("summary")
+      .describe("Output format: 'summary' for grade + counts, 'detailed' for full findings"),
+  },
+  async ({ url, format }) => {
+    try {
+      const response = await fetch(url, {
+        headers: { "User-Agent": "Graded-Security-Scanner/0.1" },
+        signal: AbortSignal.timeout(10_000),
+      });
+
+      if (!response.ok) {
+        return {
+          content: [{ type: "text" as const, text: JSON.stringify({ error: `Failed to fetch URL: ${response.status} ${response.statusText}` }) }],
+        };
+      }
+
+      const text = await response.text();
+      if (!text.trim()) {
+        return {
+          content: [{ type: "text" as const, text: JSON.stringify({ error: "URL returned empty content" }) }],
+        };
+      }
+
+      const truncated = text.slice(0, MAX_INPUT_LENGTH);
+      const result = scanPrompt(truncated);
+
+      const output = {
+        grade: result.scoreData.grade,
+        score: result.scoreData.score,
+        totalFindings: result.scoreData.totalFindings,
+        source: url,
+        contentLength: text.length,
+        severity: {
+          critical: result.scoreData.criticalCount,
+          high: result.scoreData.highCount,
+          medium: result.scoreData.mediumCount,
+          low: result.scoreData.lowCount,
+        },
+        checks: result.checks.map((c) => ({
+          name: c.checkName,
+          passed: c.passed,
+          ...(format === "detailed" ? { findings: c.findings.map((f) => ({
+            category: f.category,
+            severity: f.severity,
+            description: f.description,
+            evidence: f.evidence.slice(0, 200),
+          })) } : { findingCount: c.findings.length }),
+        })),
+        safe: result.scoreData.grade === "A" || result.scoreData.grade === "B",
+      };
+
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(output, null, 2) }],
+      };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify({ error: `Failed to scan URL: ${message}` }) }],
+      };
+    }
+  }
+);
+
+// Tool 3: Batch scan multiple prompts
 server.tool(
   "scan_prompts_batch",
   "Scan multiple prompts at once. Returns grades for each and an overall risk summary.",

@@ -1,10 +1,12 @@
 # Graded — AI Prompt Security Scanner
 
-Trust grades for the AI age. Scan any prompt and get an A-F trust score. Instantly.
+The security layer between AI agents and the internet. Scan any prompt, URL, llms.txt, or shared skill and get an A-F trust score. Instantly.
 
 ## What It Does
 
-Graded scans AI prompts for security threats using a two-layer detection system:
+AI agents consume content from everywhere: prompt marketplaces, shared skills, MCP tools, llms.txt files, web pages. None of it is scanned for prompt injection. Graded is the trust layer that scans it all.
+
+Two-layer detection:
 
 - **Layer 1 — Regex Engine:** 182+ attack patterns across 9 categories (120 hand-built + 62 from Augustus open source). Instant, deterministic.
 - **Layer 2 — AI Deep Scan:** Multi-model analysis via Kalibr (Claude, GPT-4o, Gemini). Catches semantic attacks that regex misses.
@@ -38,7 +40,7 @@ Browser → Regex Scan (182+ patterns) → A-F Grade
 2. **CLI** — `python3 graded.py scan --text "..."`
 3. **REST API** — `POST /api/scan`
 4. **npm Package** — `import { scanPrompt } from '@graded/scanner'`
-5. **MCP Server** — AI agents self-audit before executing
+5. **MCP Server** — AI agents scan prompts and URLs before executing
 6. **Chrome Extension** — Real-time grades while you type
 7. **Marketplace Scanner** — Grade prompts on FlowGPT, PromptBase, GitHub
 

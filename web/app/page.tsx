@@ -206,9 +206,9 @@ export default function Home() {
               Trust grades for the <span className="text-green-500">AI age</span>.
             </h1>
             <p className="text-zinc-400 text-sm sm:text-lg max-w-xl mx-auto">
-              Millions of prompts shared daily. Nobody checks if they&apos;re safe.
+              Prompts, llms.txt files, shared skills, web content. Agents consume it all without checking.
               <br className="hidden sm:block" />
-              Graded scans any prompt and gives it an A-F trust score. Instantly.
+              Graded scans any prompt or URL and gives it an A-F trust score. Instantly.
             </p>
           </div>
 
@@ -620,11 +620,11 @@ export default function Home() {
                   <span className="text-green-500 font-mono text-xs w-6">05</span>
                   <span className="text-lg">🤖</span>
                   <span className="font-bold text-sm flex-1">MCP Server</span>
-                  <span className="text-xs text-zinc-500 hidden sm:inline">AI agents self-audit before executing</span>
+                  <span className="text-xs text-zinc-500 hidden sm:inline">AI agents scan before consuming</span>
                 </summary>
                 <div className="px-4 sm:px-6 pb-4 sm:pb-5 border-t border-zinc-800">
                   <p className="text-xs text-zinc-400 mt-4 mb-3">
-                    Add Graded as a tool in any MCP-compatible AI agent. The agent scans prompts before executing them. Works with Claude Desktop, Cursor, and any MCP client.
+                    Add Graded as a tool in any MCP-compatible AI agent. The agent scans prompts and URLs before consuming them. Scan llms.txt files, shared skills, web content, and any text an agent encounters. Works with Claude Desktop, Cursor, and any MCP client.
                   </p>
                   <div className="bg-black rounded-lg p-4 font-mono text-sm overflow-x-auto space-y-3">
                     <div>
@@ -646,8 +646,8 @@ export default function Home() {
                     <div>
                       <div className="text-zinc-500"># 3. Your agent now has these tools:</div>
                       <div className="text-zinc-500"># scan_prompt - Grade a single prompt A-F</div>
+                      <div className="text-zinc-500"># scan_url - Scan a URL, llms.txt, or web page</div>
                       <div className="text-zinc-500"># scan_prompts_batch - Grade multiple prompts</div>
-                      <div className="text-zinc-500"># scan_mcp_config - Audit an MCP config file</div>
                     </div>
                   </div>
                 </div>

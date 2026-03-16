@@ -30,14 +30,14 @@ const slides = [
     id: "problem",
     content: (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="text-5xl sm:text-7xl font-bold text-white mb-8 leading-tight">
-          260,000 prompts.
+        <div className="text-4xl sm:text-6xl font-bold text-white mb-8 leading-tight">
+          Prompts everywhere.
           <br />
           <span className="text-zinc-500">Zero security scanning.</span>
         </div>
         <div className="max-w-2xl space-y-3 text-base sm:text-lg text-zinc-400">
-          <p>The three biggest prompt marketplaces. PromptBase. FlowGPT. GPT Store.</p>
-          <p>Millions of prompts shared daily. <span className="text-red-400 font-semibold">Nobody checks if they&apos;re safe.</span></p>
+          <p>260K prompts on marketplaces. Shared skills on GitHub. llms.txt files on websites. MCP tools agents download autonomously.</p>
+          <p>Every one of them can contain prompt injection. <span className="text-red-400 font-semibold">Nobody checks.</span></p>
         </div>
       </div>
     ),
@@ -91,11 +91,11 @@ const slides = [
           </div>
           <div className="border border-zinc-700 rounded-xl p-5 bg-zinc-900/50 text-center">
             <div className="text-3xl sm:text-4xl font-black text-red-400 mb-2">0</div>
-            <div className="text-sm text-zinc-400">tools scanning what agents actually consume.</div>
+            <div className="text-sm text-zinc-400">tools scanning prompts, llms.txt, or shared skills before agents consume them.</div>
           </div>
           <div className="border border-zinc-700 rounded-xl p-5 bg-zinc-900/50 text-center">
             <div className="text-3xl sm:text-4xl font-black text-yellow-400 mb-2">&infin;</div>
-            <div className="text-sm text-zinc-400">Agents downloading prompts autonomously. No human review.</div>
+            <div className="text-sm text-zinc-400">Websites, repos, and marketplaces agents download from. No human review.</div>
           </div>
         </div>
         <p className="text-base sm:text-lg text-zinc-400 text-center max-w-lg">
@@ -165,6 +165,7 @@ const slides = [
                 ["MCP Servers", "✓", "✓", "—", "—"],
                 ["Tool Configs", "✓", "✓", "—", "—"],
                 ["API Endpoints", "—", "✓", "✓", "—"],
+                ["URL / llms.txt Scanning", "—", "—", "—", "✓"],
                 ["Shared Prompts", "—", "—", "—", "✓"],
                 ["Trust Grading (A-F)", "—", "—", "—", "✓"],
                 ["AI Deep Scan", "—", "—", "~", "✓"],

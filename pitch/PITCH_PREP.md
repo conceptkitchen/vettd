@@ -26,10 +26,10 @@
 ### SLIDE 2: PROBLEM (12 sec)
 *Energy: matter-of-fact, almost disbelief*
 
-"260,000 prompts on the three biggest marketplaces. PromptBase. FlowGPT. GPT Store. Millions shared daily. Zero security scanning. Not low. Zero."
+"260,000 prompts on marketplaces. Shared skills on GitHub. llms.txt files on websites. MCP tools agents install autonomously. Every one of them can contain prompt injection. Nobody checks."
 
-> **Sable:** Hit "Zero" twice. First time as the stat. Second time for emphasis. The repetition turns a number into an emotion.
-> **Cass:** "Not low, zero" is key. Investors hear "low" and think "someone's working on it." Zero means greenfield.
+> **Sable:** The list of surfaces (marketplaces, GitHub, llms.txt, MCP) paints the scale without needing a big number. Each item is a mental image.
+> **Cass:** This reframe moves the problem from "niche marketplace thing" to "the entire internet is the attack surface." That's a venture-scale problem.
 
 ---
 
@@ -46,10 +46,10 @@
 ### SLIDE 4: WHY NOW (12 sec)
 *Energy: urgency, lean forward*
 
-"MCP adoption 10x'd in 6 months. AI agents are everywhere. And agents don't just run prompts, they download them autonomously. No human review. The attack surface went from 'person pastes text' to 'agents chain-download code without looking.'"
+"MCP adoption 10x'd in 6 months. AI agents are everywhere. And they don't just run prompts. They browse websites, read llms.txt files, download shared skills, install MCP tools. All autonomously. No human review. The attack surface went from 'person pastes text' to 'agents chain-download code without looking.'"
 
-> **Sable:** "Chain-download code without looking" is your sharpest image. Land it.
-> **Cass:** "Why now" is the slide investors actually care about most. MCP + agents = timing proof.
+> **Sable:** "Chain-download code without looking" is your sharpest image. Land it. The llms.txt mention is the insider signal that tells technical investors you understand the frontier.
+> **Cass:** "Why now" is the slide investors actually care about most. MCP + agents + llms.txt = timing proof. This isn't hypothetical. It's happening now.
 
 ---
 
@@ -170,9 +170,9 @@ If pushed: "In fact, we use Aikido and CodeRabbit in our own SDLC. They scan our
 ---
 
 ### 5. "How big is this market?"
-**"Prompt security is a subset of AI security, which Gartner projects at $60B+ by 2028. But the real number: there are 260,000 prompts on marketplaces today, millions shared daily, and zero scanning. The market doesn't exist yet because nobody built the product. We did."**
+**"It's not just prompt marketplaces. Every AI agent that touches the internet needs a security layer between it and the content. Shared skills on GitHub, llms.txt files, MCP tools, web pages agents crawl. That's the entire indexed web as the attack surface. AI security is projected at $60B+ by 2028. We're building the trust layer for all of it."**
 
-If pushed: "The SSL certificate market is $4.2B. 'Graded Verified' is the same model applied to AI prompts. Marketplaces will license the badge the same way websites license the padlock."
+If pushed: "The SSL certificate market is $4.2B. 'Graded Verified' is the same model applied to AI prompts. Marketplaces will license the badge the same way websites license the padlock. But the real play is every agent framework shipping with Graded as a default security layer. npm audit for AI prompts."
 
 ---
 
@@ -212,6 +212,13 @@ If pushed: "The SSL certificate market is $4.2B. 'Graded Verified' is the same m
 **"Yes. getgraded.vercel.app. Scan anything."**
 
 *This is your mic drop. Nobody else at demo day can say that.*
+
+---
+
+### 13. "What about agents browsing the web? How does Graded help there?"
+**"That's the next frontier and we're already built for it. Our MCP server has a scan_url tool. An agent encounters a website, an llms.txt file, a shared skill on GitHub. Before consuming it, it calls Graded, scans the content, gets a trust grade. A or B, proceed. D or F, block it. We're the security layer between agents and the internet. npm audit for AI prompts."**
+
+If pushed: "Unit 42 at Palo Alto Networks already documented real prompt injection attacks hidden in websites. Font-size zero text, invisible instructions, hidden payloads. One page had 24 injection attempts embedded in it. This isn't theoretical. It's happening now. And nobody's scanning for it except us."
 
 ---
 
