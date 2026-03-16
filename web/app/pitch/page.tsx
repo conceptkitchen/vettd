@@ -8,16 +8,19 @@ const slides = [
     id: "hook",
     content: (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="text-8xl sm:text-[10rem] font-black text-red-500 leading-none mb-4">
-          28%
+        <div className="text-lg sm:text-xl text-zinc-400 uppercase tracking-widest mb-6">
+          OWASP 2025
+        </div>
+        <div className="text-4xl sm:text-6xl font-black text-red-500 leading-tight mb-6 max-w-2xl">
+          Prompt injection is the #1 AI vulnerability.
         </div>
         <div className="text-xl sm:text-2xl text-zinc-300 max-w-xl">
-          of the top 50 most downloaded shared prompts
+          35% of real-world AI incidents. $100K+ losses.
           <br />
-          <span className="text-red-400 font-bold">contain hidden attacks.</span>
+          <span className="text-red-400 font-bold">From a single prompt.</span>
         </div>
-        <div className="mt-8 text-base sm:text-lg text-zinc-400">
-          One prompt. <span className="text-white font-bold">847,000 downloads.</span> Nearly a million people ran hostile code without knowing.
+        <div className="mt-8 text-base sm:text-lg text-zinc-500">
+          Nobody&apos;s scanning.
         </div>
       </div>
     ),
