@@ -216,9 +216,16 @@ If pushed: "The SSL certificate market is $4.2B. 'Graded Verified' is the same m
 ---
 
 ### 13. "What about agents browsing the web? How does Graded help there?"
-**"That's the next frontier and we're already built for it. Our MCP server has a scan_url tool. An agent encounters a website, an llms.txt file, a shared skill on GitHub. Before consuming it, it calls Graded, scans the content, gets a trust grade. A or B, proceed. D or F, block it. We're the security layer between agents and the internet. npm audit for AI prompts."**
+**"That's the next frontier and we're already built for it. Our MCP server has a scan_url tool. An agent encounters a website, an llms.txt file, a shared skill on GitHub. Before consuming it, it calls Graded, scans the content, gets a trust grade. A or B, proceed. D or F, block it. We're the security layer between agents and the internet."**
 
 If pushed: "Unit 42 at Palo Alto Networks already documented real prompt injection attacks hidden in websites. Font-size zero text, invisible instructions, hidden payloads. One page had 24 injection attempts embedded in it. This isn't theoretical. It's happening now. And nobody's scanning for it except us."
+
+---
+
+### 14. "What about false positives? What if you block something safe?"
+**"We don't just block. The agent gets back an action directive: allow, review, or block. A and B grades pass through, the agent keeps going. C grade, it pauses and shows the user what we found. The human decides. D and F, we say block. But even then the user can override. The grade is information, not a jail. You see what's wrong, you make the call. That's the difference between a security tool and a security partner."**
+
+If pushed: "Most security tools are binary. Pass or fail. We built a consent layer. The human stays in the loop on the edge cases. The obvious threats get blocked automatically. The gray area gets surfaced with evidence. That's how trust actually works."
 
 ---
 
