@@ -369,6 +369,17 @@ export default function Pitch() {
         />
       </div>
 
+      {/* Live Demo link */}
+      <a
+        href="/"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        className="absolute bottom-3 left-4 text-xs font-mono text-green-500 hover:text-green-400 transition-colors px-2 py-1 border border-green-800 rounded hover:border-green-600"
+      >
+        🔴 Live Demo
+      </a>
+
       {/* Slide counter */}
       <div className="absolute bottom-4 right-4 text-xs text-zinc-600 font-mono">
         {current + 1}/{total}
