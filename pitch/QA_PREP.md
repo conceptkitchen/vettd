@@ -29,6 +29,8 @@ If pushed: "OpenAI's incentive is to make their models permissive and useful. Gr
 ### 4. "What about Snyk, Aikido, or other security scanners?"
 **"They scan infrastructure. Pipes, configs, APIs, dependencies. We scan content. The actual prompt text. Look at slide 6 — nobody else does shared prompt scanning, trust grading, or auto-learning patterns. We don't compete with them. We complete the stack."**
 
+If pushed: "In fact, we use Aikido and CodeRabbit in our own SDLC. They scan our code. We scan the prompts. Complementary, not competitive."
+
 ---
 
 ### 5. "How big is this market?"
@@ -54,7 +56,7 @@ If pushed: "The SSL certificate market is $4.2B. 'Graded Verified' is the same m
 ---
 
 ### 9. "What's your 18-month plan with this money?"
-**"Months 1-3: Ship Pro API, onboard 3-5 design partners, expand pattern library to 500+. Months 4-9: First marketplace integration, Graded Verified badge live, hire security researcher. Months 10-18: Revenue from API + badges, data for Series A story. The goal is $50K ARR and 3 marketplace integrations by month 18."**
+**"Months 1-3: Ship Pro API, onboard 3-5 design partners. The pattern library already auto-syncs from three open source repos, so growth to 500+ is automated, not manual. Months 4-9: First marketplace integration, Graded Verified badge live, hire security researcher. Months 10-18: Revenue from API + badges, data for Series A story. The goal is $50K ARR and 3 marketplace integrations by month 18."**
 
 ---
 
@@ -66,7 +68,7 @@ If pushed: "The SSL certificate market is $4.2B. 'Graded Verified' is the same m
 ---
 
 ### 11. "Why $5M cap? Justify it."
-**"Working product, 7 surfaces, 2 prizes, self-learning engine, open source, multi-model AI scanning. Comparable pre-seed caps in AI security are $8-12M. Prompt Security was acquired for $250M. Aikido hit $1B in 3 years. $5M for a working product in the #1 OWASP category is conservative."**
+**"Working product, 7 surfaces, 2 prizes, self-learning engine with Neon Postgres persistence, auto-sync from 3 open source repos, multi-model AI scanning, Aikido and CodeRabbit in the SDLC. Comparable pre-seed caps in AI security are $8-12M. Prompt Security was acquired for $250M. Aikido hit $1B in 3 years. $5M for a working product in the #1 OWASP category is conservative."**
 
 ---
 
