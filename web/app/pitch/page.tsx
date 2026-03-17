@@ -202,7 +202,7 @@ const slides = [
             </div>
             <div>
               <div className="text-white font-bold mb-1">AI Deep Scan</div>
-              <div className="text-zinc-500">Kalibr detects new techniques. Extracts them as permanent patterns.</div>
+              <div className="text-zinc-500">Kalibr routes to the best model. New findings become permanent patterns.</div>
             </div>
           </div>
         </div>
