@@ -1,6 +1,6 @@
 {
   "name": "@graded/mcp-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Graded MCP Server - AI prompt security scanner for agentic workflows",
   "main": "dist/index.js",
   "bin": {
@@ -12,7 +12,9 @@
     "dev": "tsx index.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1"
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@neondatabase/serverless": "^0.10.0",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "typescript": "^5",

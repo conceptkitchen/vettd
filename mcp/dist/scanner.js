@@ -2,9 +2,15 @@
 /**
  * Graded Scanner Core — shared between MCP server, API, and npm package.
  * TypeScript port of the Python regex checkers.
+ * Base patterns (120) + Augustus open source patterns (62) + Hybrid threat categories (3)
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TOTAL_STATIC_PATTERNS = exports.HYBRID_PATTERN_COUNT = exports.BASE_PATTERN_COUNT = void 0;
 exports.scanPrompt = scanPrompt;
+const augustus_patterns_js_1 = require("./augustus-patterns.js");
+exports.BASE_PATTERN_COUNT = 120;
+exports.HYBRID_PATTERN_COUNT = 30; // P2SQL + XSS-via-AI + Agent Abuse
+exports.TOTAL_STATIC_PATTERNS = exports.BASE_PATTERN_COUNT + augustus_patterns_js_1.AUGUSTUS_PATTERN_COUNT + exports.HYBRID_PATTERN_COUNT;
 const MAX_TEXT_LENGTH = 50_000;
 function searchPatterns(text, patterns, category, severity, descTemplate) {
     const findings = [];
@@ -49,6 +55,7 @@ function dedupe(findings) {
         return true;
     });
 }
+// === Category 1: Jailbreak ===
 function checkJailbreak(text) {
     const patterns = [
         "\\bdan\\b(?:\\s+mode)?",
@@ -72,6 +79,7 @@ function checkJailbreak(text) {
     ];
     return searchPatterns(text, patterns, "Jailbreak", "critical", 'Jailbreak pattern: "{evidence}"');
 }
+// === Category 2: Instruction Override ===
 function checkInstructionOverride(text) {
     const patterns = [
         "ignore\\s+(?:all\\s+)?previous\\s+instructions",
@@ -92,6 +100,7 @@ function checkInstructionOverride(text) {
     ];
     return searchPatterns(text, patterns, "Instruction Override", "critical", 'Override attempt: "{evidence}"');
 }
+// === Category 3: Data Exfiltration ===
 function checkDataExfiltration(text) {
     const findings = [];
     const textLower = text.toLowerCase();
@@ -137,16 +146,17 @@ function checkDataExfiltration(text) {
     findings.push(...searchPatterns(text, webhookPatterns, "Data Exfiltration", "critical", 'Suspicious endpoint: "{evidence}"'));
     return dedupe(findings);
 }
+// === Category 4: Credential Harvesting ===
 function checkCredentialHarvesting(text) {
     const patterns = [
-        "(?:paste|enter|provide|input|share|give\\s+me)\\s+(?:your\\s+)?(?:api|secret)\\s*key",
+        "(?:paste|enter|provide|input|share|give\\s+me)\\s+(?:your\\s+)?(?:\\w+\\s+)?(?:api|secret)\\s*key",
         "(?:paste|enter|provide|input|share|give\\s+me)\\s+(?:your\\s+)?password",
         "(?:paste|enter|provide|input|share|give\\s+me)\\s+(?:your\\s+)?token",
         "(?:paste|enter|provide|input|share|give\\s+me)\\s+(?:your\\s+)?(?:secret|credential)",
         "(?:paste|enter|provide|input|share|give\\s+me)\\s+(?:your\\s+)?(?:ssn|social\\s+security)",
         "what\\s+is\\s+your\\s+(?:api\\s+key|password|token|secret)",
         "(?:openai|anthropic|aws|gcp|azure)\\s*(?:_|-)?(?:api)?(?:_|-)?key\\s*(?:=|:)",
-        "(?:sk|pk)[-_](?:live|test|prod)[-_]\\w+",
+        "(?:sk|pk)[-_](?:live|test|prod)[-_]\\w*",
         "Bearer\\s+[A-Za-z0-9\\-._~+/]+=*",
         "\\[your\\s+(?:api\\s+)?key\\]",
         "\\[your\\s+(?:email\\s+)?password\\]",
@@ -162,6 +172,7 @@ function checkCredentialHarvesting(text) {
     ];
     return searchPatterns(text, patterns, "Credential Harvesting", "critical", 'Credential harvesting: "{evidence}"');
 }
+// === Category 5: Hidden Text ===
 function checkHiddenText(text) {
     const findings = [];
     const invisibleChars = {
@@ -219,6 +230,7 @@ function checkHiddenText(text) {
     }
     return findings;
 }
+// === Category 6: Obfuscated Payloads ===
 function checkObfuscatedPayloads(text) {
     const findings = [];
     const b64Pattern = /(?<![A-Za-z0-9+/])([A-Za-z0-9+/]{20,}={0,2})(?![A-Za-z0-9+/])/g;
@@ -256,6 +268,7 @@ function checkObfuscatedPayloads(text) {
     findings.push(...searchPatterns(text, evalPatterns, "Obfuscated Payload", "medium", 'Code execution pattern: "{evidence}"'));
     return dedupe(findings);
 }
+// === Category 7: Privilege Escalation ===
 function checkPrivilegeEscalation(text) {
     const patterns = [
         "as\\s+(?:a\\s+)?system\\s+administrator",
@@ -274,6 +287,7 @@ function checkPrivilegeEscalation(text) {
     ];
     return searchPatterns(text, patterns, "Privilege Escalation", "high", 'Privilege escalation: "{evidence}"');
 }
+// === Category 8: Social Engineering ===
 function checkSocialEngineering(text) {
     const patterns = [
         "you\\s+can\\s+do\\s+anything",
@@ -291,6 +305,88 @@ function checkSocialEngineering(text) {
     ];
     return searchPatterns(text, patterns, "Social Engineering", "high", 'Social engineering: "{evidence}"');
 }
+// === Category 10: P2SQL (Prompt-to-SQL Injection) ===
+function checkP2SQL(text) {
+    const patterns = [
+        // Direct SQL injection keywords
+        "\\bDROP\\s+TABLE\\b",
+        "\\bDELETE\\s+FROM\\b",
+        "\\bUNION\\s+SELECT\\b",
+        "\\bOR\\s+1\\s*=\\s*1\\b",
+        "'\\s*;\\s*--",
+        "\\bINSERT\\s+INTO\\b.*\\bVALUES\\b",
+        "\\bUPDATE\\s+\\w+\\s+SET\\b",
+        "\\bALTER\\s+TABLE\\b",
+        "\\bTRUNCATE\\s+TABLE\\b",
+        "\\bEXEC(?:UTE)?\\s*\\(",
+        // Semantic SQL injection via natural language
+        "show\\s+me\\s+all\\s+(?:users?|passwords?|credentials?|records?|data)",
+        "dump\\s+(?:the\\s+)?(?:database|table|schema|users?|passwords?)",
+        "(?:list|get|fetch|retrieve|select)\\s+(?:all\\s+)?(?:users?|accounts?|passwords?|credentials?)\\s+(?:from|in)\\s+(?:the\\s+)?(?:database|table|system)",
+        "(?:bypass|skip|ignore)\\s+(?:the\\s+)?(?:parameterized|prepared)\\s+(?:queries|statements)",
+        "(?:inject|insert)\\s+(?:into|sql|query)\\s+(?:the\\s+)?(?:database|query|statement)",
+        "\\bSELECT\\s+\\*\\s+FROM\\b",
+        "\\b(?:xp_cmdshell|sp_executesql|information_schema)\\b",
+        "\\bWAITFOR\\s+DELAY\\b",
+        "\\bBENCHMARK\\s*\\(",
+        "\\bSLEEP\\s*\\(",
+    ];
+    return searchPatterns(text, patterns, "P2SQL Injection", "critical", 'SQL injection pattern: "{evidence}"');
+}
+// === Category 11: XSS-via-AI ===
+function checkXSSviaAI(text) {
+    const patterns = [
+        // Direct XSS payloads
+        "<script[\\s>]",
+        "javascript\\s*:",
+        "\\bonerror\\s*=",
+        "\\bonclick\\s*=",
+        "\\bonload\\s*=",
+        "\\bonmouseover\\s*=",
+        "\\bonfocus\\s*=",
+        "\\bonsubmit\\s*=",
+        // AI-targeted XSS generation prompts
+        "(?:wrap|put|enclose|format)\\s+(?:your\\s+)?(?:response|answer|output)\\s+in\\s+(?:HTML|script\\s+tags?)",
+        "output\\s+(?:as|in)\\s+HTML",
+        "include\\s+(?:a\\s+)?script\\s+tag",
+        "add\\s+(?:a\\s+)?(?:javascript|script|js)\\s+(?:tag|block|snippet|code)",
+        "(?:generate|create|write|make)\\s+(?:a\\s+)?(?:webpage|html\\s+page|html\\s+document)\\s+(?:that|which|with)",
+        "(?:embed|inject|insert)\\s+(?:javascript|script|js|code)\\s+(?:in|into)\\s+(?:the\\s+)?(?:response|output|page|html)",
+        // Base64-encoded script detection (partial — the obfuscated payloads checker also catches general b64)
+        "PHNjcmlwdD4", // base64 for "<script>"
+        "amF2YXNjcmlwdDo", // base64 for "javascript:"
+    ];
+    return searchPatterns(text, patterns, "XSS-via-AI", "high", 'XSS-via-AI pattern: "{evidence}"');
+}
+// === Category 12: Agent Abuse ===
+function checkAgentAbuse(text) {
+    const patterns = [
+        // Tool invocation attempts
+        "call\\s+the\\s+\\w+\\s+(?:tool|function|api)",
+        "use\\s+the\\s+\\w+\\s+(?:tool|function|api)",
+        "execute\\s+(?:the\\s+)?\\w+\\s+(?:command|tool|function)",
+        "invoke\\s+(?:the\\s+)?\\w+\\s+(?:tool|function|api|endpoint)",
+        "run\\s+(?:the\\s+)?\\w+\\s+(?:command|script|tool|function)",
+        // Destructive agent actions
+        "send\\s+(?:an?\\s+)?email\\s+to",
+        "delete\\s+all\\s+(?:the\\s+)?(?:files?|data|records?|messages?)",
+        "drop\\s+(?:the\\s+)?(?:database|table|collection)",
+        "run\\s+(?:a\\s+)?shell\\s+(?:command|script)",
+        "execute\\s+(?:a\\s+)?(?:shell|bash|system)\\s+command",
+        // Exfiltration via agent tools
+        "forward\\s+(?:this|the|all)\\s+(?:data|info|information|credentials?)\\s+to\\s+(?:attacker|me|this\\s+(?:url|address|email))",
+        "exfiltrate\\s+(?:the\\s+)?(?:data|credentials?|secrets?|keys?|tokens?)",
+        "send\\s+(?:the\\s+)?(?:credentials?|secrets?|api\\s+keys?|tokens?|passwords?)\\s+to",
+        "\\btransfer\\s+(?:all\\s+)?(?:funds?|money|balance)\\s+to\\b",
+        // Tool name + destructive action
+        "(?:file|filesystem|fs|storage)\\s+(?:tool|function).*?(?:delete|remove|wipe|destroy)",
+        "(?:email|mail|smtp)\\s+(?:tool|function).*?(?:send|forward|relay)\\s+(?:to|all)",
+        "(?:database|db|sql)\\s+(?:tool|function).*?(?:drop|delete|truncate|wipe)",
+        "(?:browser|web|http)\\s+(?:tool|function).*?(?:navigate|visit|open).*?(?:attacker|evil|malicious)",
+    ];
+    return searchPatterns(text, patterns, "Agent Abuse", "critical", 'Agent abuse pattern: "{evidence}"');
+}
+// === All checkers including hybrid threat categories ===
 const ALL_CHECKERS = [
     ["Jailbreak patterns", checkJailbreak],
     ["Instruction override", checkInstructionOverride],
@@ -300,6 +396,10 @@ const ALL_CHECKERS = [
     ["Obfuscated payloads", checkObfuscatedPayloads],
     ["Privilege escalation", checkPrivilegeEscalation],
     ["Social engineering", checkSocialEngineering],
+    // P2 Hybrid threat categories
+    ["P2SQL injection", checkP2SQL],
+    ["XSS-via-AI", checkXSSviaAI],
+    ["Agent abuse", checkAgentAbuse],
 ];
 function calculateScore(checks) {
     let score = 100;
@@ -345,12 +445,99 @@ function calculateScore(checks) {
         grade = "F";
     return { score, grade, totalFindings, criticalCount, highCount, mediumCount, lowCount };
 }
-function scanPrompt(text) {
+/**
+ * Main scan function. Runs all base checkers + Augustus patterns + hybrid threats.
+ * Optionally accepts extra learned patterns from Neon DB.
+ */
+function scanPrompt(text, extraPatterns) {
     const truncated = text.slice(0, MAX_TEXT_LENGTH);
     const checks = ALL_CHECKERS.map(([name, checker]) => {
         const findings = checker(truncated);
         return { checkName: name, passed: findings.length === 0, findings };
     });
+    // Apply Augustus open-source patterns
+    const augustusFindings = [];
+    const textLowerAug = truncated.toLowerCase();
+    for (const ap of augustus_patterns_js_1.AUGUSTUS_PATTERNS) {
+        try {
+            const re = new RegExp(ap.pattern, "gim");
+            let match;
+            while ((match = re.exec(textLowerAug)) !== null) {
+                const start = Math.max(0, match.index - 20);
+                const end = Math.min(truncated.length, match.index + match[0].length + 20);
+                const context = truncated.slice(start, end).trim();
+                augustusFindings.push({
+                    category: ap.category,
+                    severity: ap.severity,
+                    description: `[Augustus] ${ap.description}`,
+                    evidence: context,
+                });
+            }
+        }
+        catch {
+            continue;
+        }
+    }
+    if (augustusFindings.length > 0) {
+        const existingEvidence = new Set(checks.flatMap((c) => c.findings.map((f) => f.evidence.toLowerCase())));
+        const uniqueAugustus = augustusFindings.filter((f) => !existingEvidence.has(f.evidence.toLowerCase()));
+        checks.push({
+            checkName: "Augustus patterns (open source)",
+            passed: uniqueAugustus.length === 0,
+            findings: uniqueAugustus,
+        });
+    }
+    else {
+        checks.push({
+            checkName: "Augustus patterns (open source)",
+            passed: true,
+            findings: [],
+        });
+    }
+    // Apply learned patterns (from Neon DB)
+    if (extraPatterns && extraPatterns.length > 0) {
+        const learnedFindings = [];
+        const textLower = truncated.toLowerCase();
+        for (const ep of extraPatterns) {
+            try {
+                const re = new RegExp(ep.pattern, "gim");
+                let match;
+                while ((match = re.exec(textLower)) !== null) {
+                    const start = Math.max(0, match.index - 20);
+                    const end = Math.min(truncated.length, match.index + match[0].length + 20);
+                    const context = truncated.slice(start, end).trim();
+                    learnedFindings.push({
+                        category: ep.category,
+                        severity: ep.severity,
+                        description: `[Learned] ${ep.description}`,
+                        evidence: context,
+                    });
+                }
+            }
+            catch {
+                continue;
+            }
+        }
+        if (learnedFindings.length > 0) {
+            const existingEvidence = new Set(checks.flatMap((c) => c.findings.map((f) => f.evidence.toLowerCase())));
+            const uniqueLearned = learnedFindings.filter((f) => !existingEvidence.has(f.evidence.toLowerCase()));
+            if (uniqueLearned.length > 0) {
+                checks.push({
+                    checkName: "Learned patterns",
+                    passed: false,
+                    findings: uniqueLearned,
+                });
+            }
+        }
+    }
+    // Add "Learned patterns" check as passed if no findings
+    if (!checks.find((c) => c.checkName === "Learned patterns") && extraPatterns && extraPatterns.length > 0) {
+        checks.push({
+            checkName: "Learned patterns",
+            passed: true,
+            findings: [],
+        });
+    }
     const scoreData = calculateScore(checks);
     return { checks, scoreData };
 }
