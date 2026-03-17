@@ -243,6 +243,25 @@ python3 graded.py scan --dir ./prompts/ --json || echo "BLOCKED"
 - `anthropic` package only for `--deep` flag
 - Node.js 18+ for MCP server and web app
 
+## Live Integration: CaMeL 4-Gate Architecture
+
+Graded powers the security layer for [Clawdia](https://github.com/conceptkitchen), an AI agent relay handling Telegram, terminal, and Claude Code channels. Four interception gates scan every message at every stage:
+
+| Gate | Where | What it catches |
+|------|-------|-----------------|
+| **Gate 1: Input** | Before SDK processes the message | Injection attempts in forwarded messages, pasted prompts |
+| **Gate 2: Tool** | Before tool execution (WebFetch, Bash, browser) | Malicious URLs, dangerous commands, XSS payloads (C+ threshold) |
+| **Gate 3: Data** | After tool results return | Poisoned data from external sources embedded in responses |
+| **Gate 4: Output** | Before delivery to user | Credential leaks, echo attacks, system prompt leakage, agent abuse tags |
+
+**Trust anchor principle:** The regex scanner is immune to prompt injection by design. Scores can only go down, never up. Code-enforced, not prompt-enforced.
+
+16 response-specific patterns catch: OpenAI keys, GitHub PATs, Slack tokens, AWS keys, JWTs, passwords, XSS, and injected tool invocation tags.
+
+Tool risk tiering classifies ~30 tools across safe/medium/high/critical levels. Safe tools skip scanning. Critical tools (browser, migrations) get full inspection.
+
+QA: 24/25 adversarial tests passing. Security events logged to JSONL for continuous improvement.
+
 ## Built At
 
 **PL_Genesis: Frontiers of Collaboration Hackathon 2026** -- Protocol Labs
