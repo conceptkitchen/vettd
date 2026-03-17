@@ -138,11 +138,15 @@ const slides = [
             <div className="text-3xl sm:text-4xl font-black text-purple-400 ml-4 whitespace-nowrap">$112K</div>
           </div>
         </div>
-        <div className="border border-zinc-800 rounded-lg px-4 py-3 bg-zinc-900/20 max-w-lg text-center">
-          <div className="text-xs text-zinc-500">
+        <div className="border border-zinc-800 rounded-lg px-4 py-3 bg-zinc-900/20 max-w-2xl text-center">
+          <div className="text-sm sm:text-base text-zinc-300 font-semibold mb-1">
             AI agent adoption is a hockey stick. AI security adoption is flat.
-            <br />
-            <span className="text-white font-semibold">The gap between them is the opportunity.</span>
+          </div>
+          <div className="text-lg sm:text-xl text-white font-bold">
+            The gap between them is the opportunity.
+          </div>
+          <div className="text-[10px] text-zinc-600 mt-2">
+            1B+ AI API calls/day. Zero pre-execution scanning. At $0.001/scan = $365M/year addressable.
           </div>
         </div>
       </div>
@@ -259,7 +263,7 @@ const slides = [
     content: (
       <div className="flex flex-col items-center justify-start h-full px-4 sm:px-6 pt-6 sm:pt-10">
         <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">
-          Already <span className="text-green-500">shipping.</span>
+          Already <span className="text-green-500">in production.</span>
         </h2>
         <div className="grid grid-cols-2 gap-3 max-w-2xl w-full mb-4">
           <div className="border border-green-800 rounded-xl p-3 bg-green-950/20 text-center">
@@ -299,7 +303,7 @@ const slides = [
             Live in production on our own AI agent
           </div>
           <div className="px-3 py-1 rounded-full border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 text-[10px] sm:text-xs font-bold tracking-wide">
-            Design partner conversations active
+            3 design partner conversations
           </div>
         </div>
       </div>
@@ -353,7 +357,7 @@ const slides = [
           <span className="text-red-400">Platform certification</span>
         </div>
         <p className="text-xs text-zinc-500 text-center max-w-lg mt-3">
-          Land with free scans. Expand as agents go to production. <span className="text-white font-semibold">Integration depth is the moat.</span>
+          Land with free scans. Expand as agents go to production. <span className="text-white font-semibold">Every Shield customer becomes a distribution channel.</span>
         </p>
       </div>
     ),
@@ -363,20 +367,28 @@ const slides = [
     id: "team",
     content: (
       <div className="flex flex-col items-center justify-center h-full text-center px-6">
-        <div className="text-3xl sm:text-5xl font-bold text-white mb-6">
+        <div className="text-3xl sm:text-5xl font-bold text-white mb-4">
           RJ Moscardon
         </div>
-        <div className="text-lg sm:text-xl text-zinc-400 mb-8">
+        <div className="text-lg sm:text-xl text-zinc-400 mb-4">
           Solo founder. 92 expert AI consultants and agents. 21 purpose-built teams.
         </div>
-        <div className="max-w-lg space-y-3 text-base text-zinc-400 mb-10">
+        <div className="text-sm text-zinc-500 mb-6 max-w-md italic">
+          I built an AI agent that runs my entire business. Then I realized anyone could inject instructions into the prompts it consumes. So I built Graded.
+        </div>
+        <div className="max-w-lg space-y-3 text-sm text-zinc-400 mb-8">
           <p>Open source engine. 212+ attack patterns. 6 MCP tools. 7 deployment surfaces. Multi-model deep scan via <span className="text-purple-400">Kalibr</span>.</p>
         </div>
         <div className="border border-green-800 rounded-xl p-6 bg-green-950/20 max-w-md w-full">
           <div className="text-green-400 text-xs uppercase tracking-widest mb-3 font-bold">Raising</div>
           <div className="text-2xl font-bold text-white mb-3">$500K pre-seed</div>
           <div className="space-y-2 text-sm text-zinc-400">
-            <p>Post-money SAFE &bull; Design partners &amp; marketplace integrations</p>
+            <p>Post-money SAFE</p>
+            <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-zinc-500">
+              <div className="border border-zinc-800 rounded px-2 py-1">Design partners</div>
+              <div className="border border-zinc-800 rounded px-2 py-1">Marketplace integrations</div>
+              <div className="border border-zinc-800 rounded px-2 py-1">Engineering hire #1</div>
+            </div>
           </div>
         </div>
       </div>
