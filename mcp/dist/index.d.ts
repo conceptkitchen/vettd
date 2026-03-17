@@ -11,8 +11,8 @@
  *   - scan_mcp_config: Scan an MCP config file/JSON for risky server definitions
  *
  * Action directives (returned in every scan response):
- *   - "allow" (A/B grades): Safe to consume
- *   - "review" (C grade): Pause and show findings to user before proceeding
+ *   - "allow" (A grade): Safe to consume
+ *   - "review" (B/C grades): Pause and show findings to user before proceeding
  *   - "block" (D/F grades): Do not consume without explicit user override
  *
  * Environment variables (optional):

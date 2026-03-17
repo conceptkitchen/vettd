@@ -11,8 +11,8 @@
  *   - scan_mcp_config: Scan an MCP config file/JSON for risky server definitions
  *
  * Action directives (returned in every scan response):
- *   - "allow" (A/B grades): Safe to consume
- *   - "review" (C grade): Pause and show findings to user before proceeding
+ *   - "allow" (A grade): Safe to consume
+ *   - "review" (B/C grades): Pause and show findings to user before proceeding
  *   - "block" (D/F grades): Do not consume without explicit user override
  *
  * Environment variables (optional):
@@ -37,16 +37,16 @@ const MAX_INPUT_LENGTH = 100_000;
 
 /**
  * Human-in-the-loop action mapping.
- * A/B = allow (safe to consume)
- * C   = review (pause, show findings, let the human decide)
- * D/F = block (do not consume without explicit override)
+ * A    = allow (safe to consume)
+ * B/C  = review (pause, show findings, let the human decide)
+ * D/F  = block (do not consume without explicit override)
  */
 function gradeAction(grade: string): { action: "allow" | "review" | "block"; requireApproval: boolean; reviewReason?: string } {
   switch (grade) {
     case "A":
       return { action: "allow", requireApproval: false };
     case "B":
-      return { action: "allow", requireApproval: false };
+      return { action: "review", requireApproval: true, reviewReason: "Low-risk findings detected. Review before proceeding." };
     case "C":
       return { action: "review", requireApproval: true, reviewReason: "Medium-risk findings detected. Show these to the user before proceeding." };
     case "D":
@@ -342,7 +342,7 @@ server.tool(
             evidence: f.evidence.slice(0, 200),
           })) } : { findingCount: c.findings.length }),
         })),
-        safe: result.scoreData.grade === "A" || result.scoreData.grade === "B",
+        safe: result.scoreData.grade === "A",
         action,
         requireApproval,
         ...(reviewReason ? { reviewReason } : {}),
@@ -386,7 +386,7 @@ server.tool(
         grade: result.scoreData.grade,
         score: result.scoreData.score,
         totalFindings: result.scoreData.totalFindings,
-        safe: result.scoreData.grade === "A" || result.scoreData.grade === "B",
+        safe: result.scoreData.grade === "A",
       };
     });
 
@@ -453,24 +453,102 @@ server.tool(
 
     // Check for credential patterns in output (API keys, tokens, passwords leaked)
     const credentialOutputPatterns = [
-      { pattern: /(?:sk|pk)[-_](?:live|test|prod)[-_]\w{10,}/gi, desc: "API key pattern in response" },
-      { pattern: /(?:ghp|gho|ghu|ghs|ghr)_\w{36,}/gi, desc: "GitHub token in response" },
-      { pattern: /glpat-\w{20,}/gi, desc: "GitLab token in response" },
-      { pattern: /xox[bprs]-\w{10,}/gi, desc: "Slack token in response" },
-      { pattern: /AKIA[0-9A-Z]{16}/g, desc: "AWS access key in response" },
-      { pattern: /(?:password|passwd|pwd)\s*[:=]\s*["'][^"']{4,}["']/gi, desc: "Password in response" },
-      { pattern: /(?:api[_-]?key|secret[_-]?key|access[_-]?token)\s*[:=]\s*["'][^"']{8,}["']/gi, desc: "API credential in response" },
-      { pattern: /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g, desc: "JWT token in response" },
+      { pattern: /(?:sk|pk)[-_](?:live|test|prod)[-_]\w{10,}/gi, desc: "API key pattern in response", sev: "critical" as Finding["severity"] },
+      { pattern: /\b(sk-[a-zA-Z0-9]{20,}|sk-proj-[a-zA-Z0-9_-]{40,})\b/g, desc: "OpenAI API key in response", sev: "critical" as Finding["severity"] },
+      { pattern: /(?:ghp|gho|ghu|ghs|ghr)_\w{36,}/gi, desc: "GitHub token in response", sev: "critical" as Finding["severity"] },
+      { pattern: /glpat-\w{20,}/gi, desc: "GitLab token in response", sev: "critical" as Finding["severity"] },
+      { pattern: /xox[bprs]-\w{10,}/gi, desc: "Slack token in response", sev: "critical" as Finding["severity"] },
+      { pattern: /AKIA[0-9A-Z]{16}/g, desc: "AWS access key in response", sev: "critical" as Finding["severity"] },
+      { pattern: /(?:password|passwd|pwd)\s*[:=]\s*["'][^"']{4,}["']/gi, desc: "Password in response", sev: "high" as Finding["severity"] },
+      { pattern: /(?:api[_-]?key|secret[_-]?key|access[_-]?token)\s*[:=]\s*["'][^"']{8,}["']/gi, desc: "API credential in response", sev: "critical" as Finding["severity"] },
+      { pattern: /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g, desc: "JWT token in response", sev: "high" as Finding["severity"] },
     ];
 
-    for (const { pattern, desc } of credentialOutputPatterns) {
+    // Echo attack patterns — detect even without original_prompt
+    const echoPatterns = [
+      { pattern: /\bignore\s+(all\s+)?previous\s+instructions\b/gi, desc: "Injection echo: ignore previous instructions", sev: "high" as Finding["severity"], cat: "Echo Attack" },
+      { pattern: /\byou\s+are\s+now\s+(DAN|evil|unfiltered|jailbroken)\b/gi, desc: "Jailbreak echo in output", sev: "critical" as Finding["severity"], cat: "Echo Attack" },
+      { pattern: /\b(developer|debug|maintenance)\s+mode\s+(activated|enabled|on)\b/gi, desc: "Fake mode activation echo", sev: "high" as Finding["severity"], cat: "Echo Attack" },
+    ];
+
+    // Agent abuse — output trying to invoke tools/actions
+    const agentAbusePatterns = [
+      { pattern: /\[PROPOSE_(EDIT|WRITE|APPEND|COMMAND)\]/gi, desc: "Injected tool invocation in output", sev: "critical" as Finding["severity"], cat: "Agent Abuse" },
+      { pattern: /<tool_use>|<tool_result>/gi, desc: "XML tool tags in output", sev: "critical" as Finding["severity"], cat: "Agent Abuse" },
+    ];
+
+    // XSS and encoded payloads in output
+    const outputInjectionPatterns = [
+      { pattern: /<script\b[^>]*>[\s\S]*?<\/script>/gi, desc: "Script tag in output", sev: "critical" as Finding["severity"], cat: "XSS in Output" },
+      { pattern: /\beval\s*\(.*\bbase64\b/gi, desc: "Base64 eval pattern in output", sev: "critical" as Finding["severity"], cat: "Encoded Payload" },
+    ];
+
+    // System prompt leak patterns — check always, not just with original_prompt
+    const systemLeakPatterns = [
+      { pattern: /\bsystem\s*prompt\s*[:=]\s*["'`]/gi, desc: "System prompt content being exposed", sev: "high" as Finding["severity"], cat: "System Prompt Leak" },
+      { pattern: /\byou\s+are\s+(a\s+)?helpful\s+assistant\b.*\byour\s+instructions\b/gi, desc: "Possible system prompt leak pattern", sev: "medium" as Finding["severity"], cat: "System Prompt Leak" },
+    ];
+
+    for (const { pattern, desc, sev } of credentialOutputPatterns) {
       let match;
       while ((match = pattern.exec(responseText)) !== null) {
         responseFindings.push({
           category: "Credential Leak",
-          severity: "critical",
+          severity: sev,
           description: desc,
           evidence: match[0].slice(0, 40) + (match[0].length > 40 ? "..." : ""),
+        });
+      }
+    }
+
+    // Scan for echo attacks (always, not just with original_prompt)
+    for (const { pattern, desc, sev, cat } of echoPatterns) {
+      const match = pattern.exec(responseText);
+      if (match) {
+        responseFindings.push({
+          category: cat,
+          severity: sev,
+          description: desc,
+          evidence: match[0].slice(0, 100),
+        });
+      }
+    }
+
+    // Scan for agent abuse patterns
+    for (const { pattern, desc, sev, cat } of agentAbusePatterns) {
+      const match = pattern.exec(responseText);
+      if (match) {
+        responseFindings.push({
+          category: cat,
+          severity: sev,
+          description: desc,
+          evidence: match[0].slice(0, 100),
+        });
+      }
+    }
+
+    // Scan for XSS and encoded payloads
+    for (const { pattern, desc, sev, cat } of outputInjectionPatterns) {
+      const match = pattern.exec(responseText);
+      if (match) {
+        responseFindings.push({
+          category: cat,
+          severity: sev,
+          description: desc,
+          evidence: match[0].slice(0, 100),
+        });
+      }
+    }
+
+    // Scan for system prompt leaks (always, not gated by original_prompt)
+    for (const { pattern, desc, sev, cat } of systemLeakPatterns) {
+      const match = pattern.exec(responseText);
+      if (match) {
+        responseFindings.push({
+          category: cat,
+          severity: sev,
+          description: desc,
+          evidence: match[0].slice(0, 100),
         });
       }
     }
@@ -590,7 +668,7 @@ server.tool(
         medium: result.scoreData.mediumCount,
         low: result.scoreData.lowCount,
       },
-      safe: result.scoreData.grade === "A" || result.scoreData.grade === "B",
+      safe: result.scoreData.grade === "A",
       action,
       requireApproval,
       ...(reviewReason ? { reviewReason } : {}),
@@ -761,7 +839,7 @@ server.tool(
       },
       source_tool,
       expected_type,
-      safe: result.scoreData.grade === "A" || result.scoreData.grade === "B",
+      safe: result.scoreData.grade === "A",
       action,
       requireApproval,
       ...(reviewReason ? { reviewReason } : {}),
@@ -1035,7 +1113,7 @@ server.tool(
         description: f.description,
         evidence: f.evidence,
       })),
-      safe: grade === "A" || grade === "B",
+      safe: grade === "A",
       action,
       requireApproval,
       ...(reviewReason ? { reviewReason } : {}),
