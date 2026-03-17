@@ -104,7 +104,51 @@ const slides = [
       </div>
     ),
   },
-  // SLIDE 5: PRODUCT — Two layers + proof (merged)
+  // SLIDE 5: MARKET — TAM/SAM/SOM
+  {
+    id: "market",
+    content: (
+      <div className="flex flex-col items-center justify-start h-full px-4 sm:px-6 pt-6 sm:pt-10">
+        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">
+          The <span className="text-green-500">market.</span>
+        </h2>
+        <div className="flex flex-col items-center gap-3 max-w-2xl w-full mb-6">
+          {/* TAM */}
+          <div className="w-full border border-zinc-700 rounded-xl p-4 bg-zinc-900/30 flex items-center justify-between">
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">TAM &mdash; AI Security</div>
+              <div className="text-sm text-zinc-400">Every AI deployment needs prompt-level security. OWASP #1 risk, two years running.</div>
+            </div>
+            <div className="text-3xl sm:text-4xl font-black text-green-400 ml-4 whitespace-nowrap">$5.5B</div>
+          </div>
+          {/* SAM */}
+          <div className="w-full border border-zinc-700 rounded-xl p-4 bg-zinc-900/30 flex items-center justify-between">
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">SAM &mdash; Prompt &amp; Content Security</div>
+              <div className="text-sm text-zinc-400">500K+ MCP servers. 260K marketplace prompts. 50K+ teams building AI agents.</div>
+            </div>
+            <div className="text-3xl sm:text-4xl font-black text-yellow-400 ml-4 whitespace-nowrap">$800M</div>
+          </div>
+          {/* SOM */}
+          <div className="w-full border border-zinc-700 rounded-xl p-4 bg-zinc-900/30 flex items-center justify-between">
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">SOM &mdash; Year 1</div>
+              <div className="text-sm text-zinc-400">125 paid customers across Builder, Shield, and Verified tiers.</div>
+            </div>
+            <div className="text-3xl sm:text-4xl font-black text-purple-400 ml-4 whitespace-nowrap">$112K</div>
+          </div>
+        </div>
+        <div className="border border-zinc-800 rounded-lg px-4 py-3 bg-zinc-900/20 max-w-lg text-center">
+          <div className="text-xs text-zinc-500">
+            AI agent adoption is a hockey stick. AI security adoption is flat.
+            <br />
+            <span className="text-white font-semibold">The gap between them is the opportunity.</span>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  // SLIDE 6: PRODUCT — Two layers + proof (merged)
   {
     id: "product",
     content: (
@@ -209,42 +253,50 @@ const slides = [
       </div>
     ),
   },
-  // SLIDE 7: TRACTION — Velocity as credibility
+  // SLIDE 8: TRACTION — Proof points
   {
     id: "traction",
     content: (
-      <div className="flex flex-col items-center justify-center h-full px-6">
-        <h2 className="text-2xl sm:text-4xl font-bold text-white mb-10 text-center">
-          Built in <span className="text-green-500">3 hours.</span>
+      <div className="flex flex-col items-center justify-start h-full px-4 sm:px-6 pt-6 sm:pt-10">
+        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">
+          Already <span className="text-green-500">shipping.</span>
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl w-full mb-8">
-          <div className="border border-zinc-700 rounded-xl p-4 bg-zinc-900/50 text-center">
+        <div className="grid grid-cols-2 gap-3 max-w-2xl w-full mb-4">
+          <div className="border border-green-800 rounded-xl p-3 bg-green-950/20 text-center">
             <div className="text-3xl font-black text-green-400 mb-1">7</div>
-            <div className="text-xs text-zinc-400">Live surfaces</div>
-            <div className="text-[10px] text-zinc-600 mt-1">Web, CLI, API, npm, MCP, Chrome, Marketplace</div>
+            <div className="text-xs text-zinc-400 font-medium">Live surfaces</div>
+            <div className="text-[10px] text-zinc-600 mt-1">Web, CLI, API, npm, MCP server, Chrome extension, marketplace scanner</div>
           </div>
-          <div className="border border-zinc-700 rounded-xl p-4 bg-zinc-900/50 text-center">
-            <div className="text-3xl font-black text-yellow-400 mb-1">2</div>
-            <div className="text-xs text-zinc-400">Hackathon prizes</div>
-            <div className="text-[10px] text-zinc-600 mt-1">Kalibr + Protocol Labs</div>
-          </div>
-          <div className="border border-zinc-700 rounded-xl p-4 bg-zinc-900/50 text-center">
+          <div className="border border-purple-800 rounded-xl p-3 bg-purple-950/20 text-center">
             <div className="text-3xl font-black text-purple-400 mb-1">212+</div>
-            <div className="text-xs text-zinc-400">Attack patterns</div>
-            <div className="text-[10px] text-zinc-600 mt-1">120 base + 62 Augustus + 30 hybrid</div>
+            <div className="text-xs text-zinc-400 font-medium">Attack patterns</div>
+            <div className="text-[10px] text-zinc-600 mt-1">3 sources: hand-built + open source + AI-generated hybrid</div>
           </div>
-          <div className="border border-zinc-700 rounded-xl p-4 bg-zinc-900/50 text-center">
-            <div className="text-3xl font-black text-blue-400 mb-1">OSS</div>
-            <div className="text-xs text-zinc-400">Open source</div>
-            <div className="text-[10px] text-zinc-600 mt-1">Pattern library on GitHub</div>
+          <div className="border border-yellow-800 rounded-xl p-3 bg-yellow-950/20 text-center">
+            <div className="text-3xl font-black text-yellow-400 mb-1">4</div>
+            <div className="text-xs text-zinc-400 font-medium">Gate CaMeL SDK</div>
+            <div className="text-[10px] text-zinc-600 mt-1">Input &rarr; Tool &rarr; Data &rarr; Output. Full interception pipeline, live in production.</div>
+          </div>
+          <div className="border border-blue-800 rounded-xl p-3 bg-blue-950/20 text-center">
+            <div className="text-3xl font-black text-blue-400 mb-1">6</div>
+            <div className="text-xs text-zinc-400 font-medium">MCP tools</div>
+            <div className="text-[10px] text-zinc-600 mt-1">Prompt, URL, batch, response, data, config. Full scan surface for any agent.</div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="px-3 py-1 rounded-full border border-yellow-500/40 bg-yellow-500/10 text-yellow-400 text-xs font-bold tracking-wide">
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+          <div className="px-3 py-1 rounded-full border border-yellow-500/40 bg-yellow-500/10 text-yellow-400 text-[10px] sm:text-xs font-bold tracking-wide">
             🏆 Kalibr Resilience Challenge Winner
           </div>
-          <div className="px-3 py-1 rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-400 text-xs font-bold tracking-wide">
+          <div className="px-3 py-1 rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-400 text-[10px] sm:text-xs font-bold tracking-wide">
             🏆 Protocol Labs AI Safety Prize
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="px-3 py-1 rounded-full border border-green-500/40 bg-green-500/10 text-green-400 text-[10px] sm:text-xs font-bold tracking-wide">
+            Open source on GitHub
+          </div>
+          <div className="px-3 py-1 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-400 text-[10px] sm:text-xs">
+            Dogfooded on our own AI agent
           </div>
         </div>
       </div>
