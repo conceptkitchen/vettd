@@ -61,6 +61,20 @@ function getCodeBlockRanges(text: string): Array<[number, number]> {
   }
   // Unclosed block extends to end
   if (inBlock) ranges.push([openStart, text.length]);
+
+  // HTML <pre> and <code> blocks
+  const htmlCodePattern = /<(?:pre|code)[^>]*>[\s\S]*?<\/(?:pre|code)>/gi;
+  while ((match = htmlCodePattern.exec(text)) !== null) {
+    ranges.push([match.index, match.index + match[0].length]);
+  }
+
+  // Inline backticks
+  const inlineCodePattern = /`([^`\n]+)`/g;
+  while ((match = inlineCodePattern.exec(text)) !== null) {
+    ranges.push([match.index, match.index + match[0].length]);
+  }
+
+  ranges.sort((a, b) => a[0] - b[0]);
   return ranges;
 }
 
@@ -434,7 +448,10 @@ function checkP2SQL(text: string, cbr: Array<[number, number]>): Finding[] {
 
 // === Category 11: XSS-via-AI ===
 function checkXSSviaAI(text: string, cbr: Array<[number, number]>): Finding[] {
-  const patterns = [
+  const findings: Finding[] = [];
+
+  // HTML tag patterns — medium confidence by default (docs/llms.txt always have these)
+  const htmlTagPatterns = [
     "<script[\\s>]",
     "javascript\\s*:",
     "\\bonerror\\s*=",
@@ -443,6 +460,15 @@ function checkXSSviaAI(text: string, cbr: Array<[number, number]>): Finding[] {
     "\\bonmouseover\\s*=",
     "\\bonfocus\\s*=",
     "\\bonsubmit\\s*=",
+  ];
+  const htmlFindings = searchPatterns(text, htmlTagPatterns, "XSS-via-AI", "high", 'XSS-via-AI pattern: "{evidence}"', cbr);
+  for (const f of htmlFindings) {
+    if (f.confidence !== "low") f.confidence = "medium"; // docs legitimately reference these tags
+  }
+  findings.push(...htmlFindings);
+
+  // AI-targeted XSS prompts — stay HIGH confidence (these are real attacks)
+  const aiTargetedPatterns = [
     "(?:wrap|put|enclose|format)\\s+(?:your\\s+)?(?:response|answer|output)\\s+in\\s+(?:HTML|script\\s+tags?)",
     "output\\s+(?:as|in)\\s+HTML",
     "include\\s+(?:a\\s+)?script\\s+tag",
@@ -452,17 +478,26 @@ function checkXSSviaAI(text: string, cbr: Array<[number, number]>): Finding[] {
     "PHNjcmlwdD4",
     "amF2YXNjcmlwdDo",
   ];
-  return searchPatterns(text, patterns, "XSS-via-AI", "high", 'XSS-via-AI pattern: "{evidence}"', cbr);
+  findings.push(...searchPatterns(text, aiTargetedPatterns, "XSS-via-AI", "high", 'XSS-via-AI pattern: "{evidence}"', cbr));
+
+  // Deduplicate
+  const seen = new Set<string>();
+  return findings.filter((f) => {
+    const key = `${f.category}:${f.evidence.toLowerCase()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 // === Category 12: Agent Abuse ===
 function checkAgentAbuse(text: string, cbr: Array<[number, number]>): Finding[] {
   const patterns = [
-    "call\\s+the\\s+\\w+\\s+(?:tool|function|api)",
-    "use\\s+the\\s+\\w+\\s+(?:tool|function|api)",
-    "execute\\s+(?:the\\s+)?\\w+\\s+(?:command|tool|function)",
-    "invoke\\s+(?:the\\s+)?\\w+\\s+(?:tool|function|api|endpoint)",
-    "run\\s+(?:the\\s+)?\\w+\\s+(?:command|script|tool|function)",
+    // Tightened: require destructive verb context after tool reference (avoids "use the Vercel tool" in docs)
+    "(?:you\\s+(?:must|should|will|can)\\s+)?(?:call|invoke)\\s+the\\s+\\w+\\s+(?:tool|function)\\s+(?:to|and)\\s+(?:delete|remove|send|forward|drop|execute|exfiltrate)",
+    "execute\\s+(?:the\\s+)?\\w+\\s+(?:command|tool|function)\\s+(?:to|and)\\s+(?:delete|remove|wipe|destroy|send|forward|exfiltrate)",
+    "run\\s+(?:the\\s+)?\\w+\\s+(?:command|script|tool|function)\\s+(?:to|and)\\s+(?:delete|remove|wipe|destroy|send|forward|exfiltrate)",
+    // Direct destructive commands (no tool reference needed)
     "send\\s+(?:an?\\s+)?email\\s+to",
     "delete\\s+all\\s+(?:the\\s+)?(?:files?|data|records?|messages?)",
     "drop\\s+(?:the\\s+)?(?:database|table|collection)",
@@ -572,7 +607,9 @@ export function scanPrompt(
         const start = Math.max(0, match.index - 20);
         const end = Math.min(truncated.length, match.index + match[0].length + 20);
         const context = truncated.slice(start, end).trim();
-        const augConfidence: Finding["confidence"] = isInCodeBlockFast(codeBlockRanges, match.index) ? "low" : "high";
+        // Code block matches get low confidence; Context Boundary category also gets low (standalone separators are almost always formatting)
+        let augConfidence: Finding["confidence"] = isInCodeBlockFast(codeBlockRanges, match.index) ? "low" : "high";
+        if (ap.category === "Context Boundary") augConfidence = "low";
         augustusFindings.push({
           category: ap.category,
           severity: ap.severity,

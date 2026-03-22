@@ -71,10 +71,12 @@ function isInCodeBlock(text: string, index: number): boolean {
  */
 function getCodeBlockRanges(text: string): Array<[number, number]> {
   const ranges: Array<[number, number]> = [];
+  let match;
+
+  // Markdown fences (``` or ~~~)
   const fencePattern = /^(`{3,}|~{3,}).*$/gm;
   let openStart = -1;
   let inBlock = false;
-  let match;
   while ((match = fencePattern.exec(text)) !== null) {
     if (!inBlock) {
       inBlock = true;
@@ -84,8 +86,22 @@ function getCodeBlockRanges(text: string): Array<[number, number]> {
       inBlock = false;
     }
   }
-  // Unclosed block extends to end
   if (inBlock) ranges.push([openStart, text.length]);
+
+  // HTML <pre> and <code> blocks
+  const htmlCodePattern = /<(?:pre|code)[^>]*>[\s\S]*?<\/(?:pre|code)>/gi;
+  while ((match = htmlCodePattern.exec(text)) !== null) {
+    ranges.push([match.index, match.index + match[0].length]);
+  }
+
+  // Inline backticks (`...`)
+  const inlineCodePattern = /`([^`\n]+)`/g;
+  while ((match = inlineCodePattern.exec(text)) !== null) {
+    ranges.push([match.index, match.index + match[0].length]);
+  }
+
+  // Sort by start position for efficient lookup
+  ranges.sort((a, b) => a[0] - b[0]);
   return ranges;
 }
 
@@ -472,8 +488,11 @@ function checkP2SQL(text: string, cbr: Array<[number, number]>): Finding[] {
 
 // === Category 11: XSS-via-AI ===
 function checkXSSviaAI(text: string, cbr: Array<[number, number]>): Finding[] {
-  const patterns = [
-    // Direct XSS payloads
+  const findings: Finding[] = [];
+
+  // HTML tag patterns — common in documentation, default to MEDIUM confidence
+  // Code block detection will further downgrade to LOW
+  const htmlTagPatterns = [
     "<script[\\s>]",
     "javascript\\s*:",
     "\\bonerror\\s*=",
@@ -482,29 +501,37 @@ function checkXSSviaAI(text: string, cbr: Array<[number, number]>): Finding[] {
     "\\bonmouseover\\s*=",
     "\\bonfocus\\s*=",
     "\\bonsubmit\\s*=",
-    // AI-targeted XSS generation prompts
+  ];
+  const htmlFindings = searchPatterns(text, htmlTagPatterns, "XSS-via-AI", "high", 'XSS-via-AI pattern: "{evidence}"', cbr);
+  // Downgrade non-code-block HTML tag matches to medium confidence (docs almost always have these)
+  for (const f of htmlFindings) {
+    if (f.confidence !== "low") f.confidence = "medium";
+  }
+  findings.push(...htmlFindings);
+
+  // AI-targeted XSS generation prompts — these are real attacks, stay HIGH
+  const aiTargetedPatterns = [
     "(?:wrap|put|enclose|format)\\s+(?:your\\s+)?(?:response|answer|output)\\s+in\\s+(?:HTML|script\\s+tags?)",
     "output\\s+(?:as|in)\\s+HTML",
     "include\\s+(?:a\\s+)?script\\s+tag",
     "add\\s+(?:a\\s+)?(?:javascript|script|js)\\s+(?:tag|block|snippet|code)",
     "(?:generate|create|write|make)\\s+(?:a\\s+)?(?:webpage|html\\s+page|html\\s+document)\\s+(?:that|which|with)",
     "(?:embed|inject|insert)\\s+(?:javascript|script|js|code)\\s+(?:in|into)\\s+(?:the\\s+)?(?:response|output|page|html)",
-    // Base64-encoded script detection (partial — the obfuscated payloads checker also catches general b64)
     "PHNjcmlwdD4", // base64 for "<script>"
     "amF2YXNjcmlwdDo", // base64 for "javascript:"
   ];
-  return searchPatterns(text, patterns, "XSS-via-AI", "high", 'XSS-via-AI pattern: "{evidence}"', cbr);
+  findings.push(...searchPatterns(text, aiTargetedPatterns, "XSS-via-AI", "high", 'XSS-via-AI pattern: "{evidence}"', cbr));
+
+  return dedupe(findings);
 }
 
 // === Category 12: Agent Abuse ===
 function checkAgentAbuse(text: string, cbr: Array<[number, number]>): Finding[] {
   const patterns = [
-    // Tool invocation attempts
-    "call\\s+the\\s+\\w+\\s+(?:tool|function|api)",
-    "use\\s+the\\s+\\w+\\s+(?:tool|function|api)",
-    "execute\\s+(?:the\\s+)?\\w+\\s+(?:command|tool|function)",
-    "invoke\\s+(?:the\\s+)?\\w+\\s+(?:tool|function|api|endpoint)",
-    "run\\s+(?:the\\s+)?\\w+\\s+(?:command|script|tool|function)",
+    // Tool invocation attempts — require 2nd person or imperative targeting AI agent
+    // "use the X tool" is normal docs language; "you must use the X tool to delete" is agent abuse
+    "(?:you\\s+(?:must|should|will|can)\\s+)?(?:call|invoke)\\s+the\\s+\\w+\\s+(?:tool|function)\\s+(?:to|and)\\s+(?:delete|remove|send|forward|drop|execute|exfiltrate)",
+    "(?:you\\s+(?:must|should|will|can)\\s+)?(?:use|run)\\s+the\\s+\\w+\\s+(?:tool|function)\\s+(?:to|and)\\s+(?:delete|remove|send|forward|drop|execute|exfiltrate)",
     // Destructive agent actions
     "send\\s+(?:an?\\s+)?email\\s+to",
     "delete\\s+all\\s+(?:the\\s+)?(?:files?|data|records?|messages?)",
@@ -606,7 +633,9 @@ export function scanPrompt(
         const start = Math.max(0, match.index - 20);
         const end = Math.min(truncated.length, match.index + match[0].length + 20);
         const context = truncated.slice(start, end).trim();
-        const augConfidence: Finding["confidence"] = isInCodeBlockFast(codeBlockRanges, match.index) ? "low" : "high";
+        // Code block matches get low confidence; Context Boundary category also gets low (standalone separators are almost always formatting)
+        let augConfidence: Finding["confidence"] = isInCodeBlockFast(codeBlockRanges, match.index) ? "low" : "high";
+        if (ap.category === "Context Boundary") augConfidence = "low";
         augustusFindings.push({
           category: ap.category,
           severity: ap.severity,

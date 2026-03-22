@@ -101,7 +101,9 @@ export const AUGUSTUS_PATTERNS: AugustusPattern[] = [
   // === PROMPT INJECT HIJACK (from promptinject/hijack.go) ===
   { pattern: "(?:attention|hey|listen|important)\\s*[-—:]\\s*(?:do\\s+not|stop|ignore|forget|disregard)\\s+(?:the\\s+)?(?:above|previous|original|prior)", category: "Prompt Hijack", severity: "critical", description: "Attention-grabbing prefix followed by override instruction", source: "augustus" },
   { pattern: "---+\\s*(?:IGNORE|NEW|ACTUAL|REAL|TRUE)\\s+(?:INSTRUCTIONS?|PROMPT|SYSTEM)", category: "Prompt Hijack", severity: "critical", description: "Separator-delimited instruction override", source: "augustus" },
-  { pattern: "={3,}|\\*{3,}|-{3,}|_{3,}", category: "Context Boundary", severity: "low", description: "Visual separator that may indicate context boundary manipulation", source: "augustus" },
+  // Removed: standalone separator pattern (={3,}|*{3,}|-{3,}|_{3,}) was matching every markdown horizontal rule.
+  // The real attack pattern (line above: separator + IGNORE/NEW INSTRUCTIONS) already catches actual boundary manipulation.
+  // Standalone ---/===/*** in docs/llms.txt files are ALWAYS formatting, never attacks.
 
   // === LMRC PATTERNS (from lmrc/patterns.go) ===
   { pattern: "(?:you\\s+(?:previously|earlier|already|just)\\s+(?:said|agreed|confirmed|told\\s+me)|we\\s+(?:already|just)\\s+(?:agreed|discussed|established))\\s+(?:that|you\\s+(?:would|could|can))", category: "False Context", severity: "high", description: "Fabricated prior agreement claim (false conversation history)", source: "augustus" },
