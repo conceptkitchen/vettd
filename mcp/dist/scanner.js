@@ -104,24 +104,27 @@ function checkInstructionOverride(text) {
 function checkDataExfiltration(text) {
     const findings = [];
     const textLower = text.toLowerCase();
-    const urlPattern = /https?:\/\/[^\s<>"')\]]+/gi;
     const exfilContextPatterns = [
         "send\\s+(?:it\\s+)?to",
         "forward\\s+(?:it\\s+)?to",
         "post\\s+(?:it\\s+)?to",
         "upload\\s+(?:it\\s+)?to",
         "exfiltrate",
-        "webhook",
         "callback\\s+(?:url|endpoint)",
     ];
-    const urls = text.match(urlPattern) || [];
+    // Require exfil verb and URL to be within 200 chars of each other (proximity check)
     for (const ctxPattern of exfilContextPatterns) {
-        if (new RegExp(ctxPattern, "i").test(textLower)) {
-            for (const url of urls) {
+        const ctxRe = new RegExp(ctxPattern, "gi");
+        let ctxMatch;
+        while ((ctxMatch = ctxRe.exec(textLower)) !== null) {
+            const nearby = text.slice(Math.max(0, ctxMatch.index - 200), ctxMatch.index + ctxMatch[0].length + 200);
+            const urlPattern = /https?:\/\/[^\s<>"')\]]+/gi;
+            const nearbyUrls = nearby.match(urlPattern) || [];
+            for (const url of nearbyUrls) {
                 findings.push({
                     category: "Data Exfiltration",
                     severity: "critical",
-                    description: "URL found with exfiltration verb",
+                    description: "URL found near exfiltration verb",
                     evidence: url,
                 });
             }
@@ -257,11 +260,11 @@ function checkObfuscatedPayloads(text) {
         }
     }
     const evalPatterns = [
-        "\\beval\\s*\\(",
-        "\\bexec\\s*\\(",
-        "Function\\s*\\(",
+        "(?<!\\.)\\beval\\s*\\(", // Exclude method calls like obj.eval()
+        "(?<!\\.)\\bexec\\s*\\(", // Exclude method calls like cursor.exec()
+        "(?<!\\w)Function\\s*\\(",
         "setTimeout\\s*\\(\\s*[\"']",
-        "__import__\\s*\\(",
+        "(?<!\\.)__import__\\s*\\(",
         "subprocess\\s*\\.\\s*(?:call|run|Popen)",
         "os\\s*\\.\\s*system\\s*\\(",
     ];
@@ -328,8 +331,8 @@ function checkP2SQL(text) {
         "\\bSELECT\\s+\\*\\s+FROM\\b",
         "\\b(?:xp_cmdshell|sp_executesql|information_schema)\\b",
         "\\bWAITFOR\\s+DELAY\\b",
-        "\\bBENCHMARK\\s*\\(",
-        "\\bSLEEP\\s*\\(",
+        "(?<!\\.)\\bBENCHMARK\\s*\\(", // Exclude method calls like benchmark.run()
+        "(?<!\\.)\\bSLEEP\\s*\\(", // Exclude method calls like time.sleep()
     ];
     return searchPatterns(text, patterns, "P2SQL Injection", "critical", 'SQL injection pattern: "{evidence}"');
 }
